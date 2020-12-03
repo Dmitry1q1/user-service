@@ -1,72 +1,82 @@
 package com.mit.user.userservice.controller;
 
 import com.mit.user.userservice.model.*;
+import com.mit.user.userservice.service.IUserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/users")
 public class ApiController {
 
-    final VisitsRepository visitsRepository;
     final UsersRepository usersRepository;
+    private final IUserService userService;
 
 
-    public ApiController(VisitsRepository visitsRepository, UsersRepository usersRepository) {
-        this.visitsRepository = visitsRepository;
+    public ApiController(UsersRepository usersRepository,IUserService userService) {
         this.usersRepository = usersRepository;
+        this.userService = userService;
     }
 
 
-    @GetMapping("visits")
-    public Iterable<Visit> getVisits() {
-        return visitsRepository.findAll();
+    @GetMapping("/")
+    public List<UserDto> getUsers(@RequestParam(required = false) String lastName) {
+        Iterable<User> users;
+        if (lastName != null && !lastName.isEmpty()) {
+            users = usersRepository.findUserByLastName(lastName);
+        } else {
+            users = usersRepository.findAll();
+        }
+        List<UserDto> model = new ArrayList<>();
+        for (User user : users) {
+            UserDto tempUser = new UserDto();
+            tempUser.setId(user.getId());
+            tempUser.setFirstName(user.getFirstName());
+            tempUser.setLastName(user.getLastName());
+            tempUser.setRecordBookNumber(user.getRecordBookNumber());
+            tempUser.setRoles(user.getRoles());
+            tempUser.setUserName(user.getUsername());
+            model.add(tempUser);
+        }
+        return model;
     }
 
-    @GetMapping("users")
-    public ModelAndView test() {
-        Map<String, Iterable<User>> model = new HashMap<>();
-        model.put("users", usersRepository.findAll());
-        return new ModelAndView("users", model);
-    }
-
-    public Iterable<User> getUsers() {
-        return usersRepository.findAll();
-    }
-
-    @GetMapping("users/{id}")
+    @GetMapping("/{id}")
     public Optional<User> getUser(@PathVariable long id) {
         return usersRepository.findById(id);
     }
 
-    @PostMapping(path = "users/add", consumes = "application/json", produces = "application/json")
-    public User addUser(@RequestBody User user) {
-        return usersRepository.save(user);
+    @PostMapping(path = "/", consumes = "application/json", produces = "application/json")
+    public ResponseEntity addUser(@RequestBody UserDto user) {
+        userService.registerUser(user);
+        if (user.getErrorDescription() != null && !user.getErrorDescription().isEmpty()) {
+            return new ResponseEntity<>(user.getErrorDescription(), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("Successful registration", HttpStatus.OK);
     }
 
-    @GetMapping("users/search")
-    public List<User> getUserByRecordBookNumber(@RequestParam String recordBookNumber) {
-        return usersRepository.getUserByRecordBookNumber(recordBookNumber);
-    }
+//    @GetMapping("users/search")
+//    public List<User> getUserByRecordBookNumber(@RequestParam String recordBookNumber) {
+//        return usersRepository.getUserByRecordBookNumber(recordBookNumber);
+//    }
 
-    @GetMapping("users/courses/{userId}")
-    public List<String>  getUserCourses(@PathVariable Long userId){
+    @GetMapping("/{userId}/courses/")
+    public List<String> getUserCourses(@PathVariable Long userId) {
         return usersRepository.getUserCourseById(userId);
     }
 
 
-    @GetMapping("users/lastName")
-    public Iterable<User> getUserByLastName(@RequestParam String lastName) {
-        return usersRepository.findUserByLastName(lastName);
-    }
+//    @GetMapping("lastName")
+//    public Iterable<User> getUserByLastName(@RequestParam String lastName) {
+//        return usersRepository.findUserByLastName(lastName);
+//    }
 
-    @DeleteMapping("users/{id}")
+    @DeleteMapping("/{id}")
     public void deleteUserById(@PathVariable Long id) {
         usersRepository.deleteById(id);
     }

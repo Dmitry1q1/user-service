@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/courses/")
+@RequestMapping("/courses")
 public class CoursesController {
     final private CoursesRepository coursesRepository;
     final private UsersRepository usersRepository;
@@ -20,7 +20,7 @@ public class CoursesController {
         this.usersRepository = usersRepository;
     }
 
-    @GetMapping(path = "", produces = "application/json")
+    @GetMapping(path = "/", produces = "application/json")
     public Iterable<CourseDto> getCourse() {
         Iterable<Course> courses = coursesRepository.findAll();
         List<CourseDto> resultCourses = new ArrayList<>();
@@ -33,58 +33,73 @@ public class CoursesController {
         return resultCourses;
     }
 
-    @GetMapping(path = "{courseId}", produces = "application/json")
+    @GetMapping(path = "/{courseId}", produces = "application/json")
     public Optional<CourseDto> getCourseById(@PathVariable long courseId) {
         Optional<Course> course = coursesRepository.findById(courseId);
         CourseDto resultCourse = null;
         if (course.isPresent()) {
             resultCourse = new CourseDto();
             resultCourse.setCourseName(course.get().getCourseName());
-            resultCourse.setId(course.get().getId());
             List<Problem> problems = new ArrayList<>();
             for (Problem problem : course.get().getProblems()) {
                 Problem problemDto = new Problem();
                 problemDto.setId(problem.getId());
                 problemDto.setProblemName(problem.getProblemName());
-                problemDto.setProblemName(problem.getProblemName());
+                problemDto.setProblemText(problem.getProblemText());
                 problemDto.setProblemTime(problem.getProblemTime());
                 problems.add(problemDto);
             }
             resultCourse.setProblems(problems);
-            List<User> users = new ArrayList<>();
-            for (User user : course.get().getUsers()) {
-                User userDto = new User();
-                userDto.setId(user.getId());
-                userDto.setFirstName(user.getFirstName());
-                userDto.setLastName(user.getLastName());
-                userDto.setRecordBookNumber(user.getRecordBookNumber());
-                userDto.setUsername(user.getUsername());
-                userDto.setRoles(user.getRoles());
-                users.add(userDto);
-            }
-            //resultCourse.setUsers(course.get().getUsers());
+//            List<User> users = new ArrayList<>();
+//            for (User user : course.get().getUsers()) {
+//                User userDto = new User();
+//                userDto.setId(user.getId());
+//                userDto.setFirstName(user.getFirstName());
+//                userDto.setLastName(user.getLastName());
+//                userDto.setRecordBookNumber(user.getRecordBookNumber());
+//                userDto.setUsername(user.getUsername());
+//                userDto.setRoles(user.getRoles());
+//                users.add(userDto);
+//            }
+//            resultCourse.setUsers(course.get().getUsers());
 
         }
 
         return Optional.ofNullable(resultCourse);
     }
 
-    @GetMapping(path = "{courseId}/all", produces = "application/json")
-    public List<String> getAllProblemsFromCourse(@PathVariable long courseId) {
-        return coursesRepository.getAllProblemsFromCourse(courseId);
+    @GetMapping(path = "/{courseId}/users", produces = "application/json")
+    public List<UserDto> getAllUsersFromCourse(@PathVariable long courseId){
+        List<String> users = coursesRepository.getAllUsersFromCourses(courseId);
+        List<UserDto> model = new ArrayList<>();
+        for (String user : users) {
+            UserDto tempUser = new UserDto();
+            String[] words = user.split(",");
+
+            tempUser.setId(Long.valueOf(words[0]));
+            tempUser.setFirstName(words[1]);
+            tempUser.setLastName(words[2]);
+            tempUser.setRecordBookNumber(words[4]);
+//            List<Role> roles = new ArrayList<>();
+//            roles.add((Role.getName())words[5]);
+//            tempUser.setRoles(words[5]);
+            tempUser.setUserName(words[3]);
+            model.add(tempUser);
+        }
+        return model;
     }
 
-    @PostMapping(path = "add", consumes = "application/json", produces = "application/json")
+    @PostMapping(path = "/", consumes = "application/json", produces = "application/json")
     public Course addCourse(@RequestBody Course course) {
         return coursesRepository.save(course);
     }
 
-    @DeleteMapping(path = "delete/{id}/")
+    @DeleteMapping(path = "/{id}")
     public void deleteCourse(@PathVariable long id) {
         coursesRepository.deleteById(id);
     }
 
-    @PostMapping(path = "{courseId}/", consumes = "application/json")
+    @PostMapping(path = "/{courseId}/", consumes = "application/json")
     public void addUserToCourse(@PathVariable long courseId, @RequestParam(name = "userId") long userId) {
         try {
             coursesRepository.addUserToCourse(courseId, userId);
@@ -100,7 +115,7 @@ public class CoursesController {
         }
     }
 
-    @DeleteMapping(path = "{courseId}/")
+    @DeleteMapping(path = "/{courseId}/", consumes = "application/json")
     public void deleteUserFromCourse(@PathVariable long courseId, @RequestParam(name = "userId") long userId) {
         coursesRepository.deleteUserFromCourse(courseId, userId);
     }

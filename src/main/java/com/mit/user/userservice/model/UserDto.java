@@ -1,6 +1,9 @@
 package com.mit.user.userservice.model;
 
+import java.util.List;
+
 public class UserDto {
+    private long id;
     private String userName;
     private String firstName;
     private String lastName;
@@ -8,6 +11,15 @@ public class UserDto {
     private String passwordConfirm;
     private String errorDescription;
     private String recordBookNumber;
+    private List<Role> roles;
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
 
     public String getRecordBookNumber() {
         return recordBookNumber;
@@ -15,6 +27,14 @@ public class UserDto {
 
     public void setRecordBookNumber(String recordBookNumber) {
         this.recordBookNumber = recordBookNumber;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getUserName() {
@@ -56,6 +76,7 @@ public class UserDto {
     public void setPasswordConfirm(String passwordConfirm) {
         this.passwordConfirm = passwordConfirm;
     }
+
     public String getErrorDescription() {
         return errorDescription;
     }

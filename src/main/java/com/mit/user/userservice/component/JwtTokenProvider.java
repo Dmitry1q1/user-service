@@ -38,13 +38,7 @@ public class JwtTokenProvider {
     @PostConstruct
     protected void init() {
         base64EncodedSecretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-//        byte[] keyBytes = Decoders.BASE64.decode(base64EncodedSecretKey);
-//        key = Keys.hmacShaKeyFor(keyBytes);
         key = Keys.hmacShaKeyFor(secretKey.getBytes());
-//        key = Keys.secretKeyFor(SignatureAlgorithm.HS256); //or HS384 or HS512
-//        key = MacProvider.generateKey(SignatureAlgorithm.HS256);
-//        key = Keys.hmacShaKeyFor(base64EncodedSecretKey.getBytes());
-//        base64EncodedSecretKey = Encoders.BASE64.encode(key.getEncoded());
     }
 
     public String createToken(String username, List<Role> roles) {
@@ -58,7 +52,6 @@ public class JwtTokenProvider {
                 .setClaims(claims)//
                 .setIssuedAt(now)//
                 .setExpiration(validity)//
-//                .signWith(SignatureAlgorithm.HS256, secretKey)//
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -69,7 +62,6 @@ public class JwtTokenProvider {
     }
 
     public String getUsername(String token) {
-//        return Jwts.parser().setSigningKey(base64EncodedSecretKey).parseClaimsJws(token).getBody().getSubject();
         return Jwts.parserBuilder().setSigningKey(base64EncodedSecretKey).build().parseClaimsJws(token).getBody().getSubject();
     }
 
@@ -83,7 +75,6 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
-//            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             Jws<Claims> claims = Jwts.parserBuilder()
                     .setSigningKey(base64EncodedSecretKey)
                     .build()
@@ -91,7 +82,6 @@ public class JwtTokenProvider {
             return !claims.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
             return false;
-//            throw new InvalidJwtAuthenticationException("Expired or invalid JWT token");
         }
     }
 }

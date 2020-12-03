@@ -20,4 +20,5 @@ public interface UsersRepository extends CrudRepository<User, Long> {
             "JOIN course co ON co.course_id = uc.course_id WHERE uc.user_id = :userId", nativeQuery = true)
     public List<String> getUserCourseById(@Param("userId") long userId);
 
+
 }

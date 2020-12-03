@@ -25,4 +25,9 @@ public interface CoursesRepository extends CrudRepository<Course, Long> {
     @Query(value = "SELECT pm.problem_name, pm.problem_text FROM problem pm JOIN course_problems cp ON cp.problems_id = pm.id" +
             " WHERE cp.course_course_id = :courseId", nativeQuery = true)
     public List<String> getAllProblemsFromCourse(@Param("courseId") long courseId);
+
+    @Query(value = "SELECT u.user_id, u.first_name, u.last_name, u.username, u.record_book_number" +
+            " FROM user u JOIN users_courses uc ON" +
+            " uc.user_id = u.user_id WHERE uc.course_id = :courseId", nativeQuery = true)
+    public List<String> getAllUsersFromCourses(@Param("courseId") long courseId);
 }
