@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CoursesRepository extends CrudRepository<Course, Long> {
@@ -30,4 +31,8 @@ public interface CoursesRepository extends CrudRepository<Course, Long> {
             " FROM user u JOIN users_courses uc ON" +
             " uc.user_id = u.user_id WHERE uc.course_id = :courseId", nativeQuery = true)
     public List<String> getAllUsersFromCourses(@Param("courseId") long courseId);
+
+    @Query(value="SELECT * FROM course co WHERE co.course_id = :courseId", nativeQuery = true)
+    public Optional<Course> getCourseById(@Param("courseId") long courseId);
+
 }

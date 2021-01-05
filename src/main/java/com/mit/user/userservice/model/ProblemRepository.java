@@ -29,9 +29,14 @@ public interface ProblemRepository extends CrudRepository<Problem, Long> {
     public void addProblem(@Param("courseId") long courseId, @Param("problemId") long problemId);
 
     @Modifying
-    @Query(value = "DELETE FROM course_problems WHERE course_id =:courseId AND problems_id = :problemId", nativeQuery = true)
+    @Query(value = "DELETE FROM course_problems WHERE course_course_id =:courseId AND problems_id = :problemId", nativeQuery = true)
     @Transactional
     public void deleteProblemFromCourse(@Param("courseId") long courseId, @Param("problemId") long problemId);
+
+    @Modifying
+    @Query(value = "DELETE FROM course_problems WHERE problems_id = :problemId", nativeQuery = true)
+    @Transactional
+    public void deleteProblemFromAllCourses( @Param("problemId") long problemId);
 
     @Modifying
     @Query(value = "UPDATE problem SET problem_name = :problemName, problem_text = :problemText" +

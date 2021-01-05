@@ -79,6 +79,7 @@ public class ProblemsController {
     public ResponseEntity deleteProblem(@PathVariable long problemId) {
         Optional<Problem> problemTemp = problemRepository.findById(problemId);
         if(problemTemp.isPresent()) {
+            problemRepository.deleteProblemFromAllCourses(problemId);
             problemRepository.deleteById(problemId);
             return new ResponseEntity<>("Problem was successfully deleted", HttpStatus.OK);
         }
