@@ -35,7 +35,7 @@ public interface ProblemRepository extends CrudRepository<Problem, Long> {
 
     @Modifying
     @Query(value = "UPDATE problem SET problem_name = :problemName, problem_text = :problemText" +
-            ", problem_time = :problemTime WHERE id = :problemId)", nativeQuery = true)
+            ", problem_time = :problemTime WHERE id = :problemId", nativeQuery = true)
     @Transactional
     public void updateProblem(@Param("problemId") long problemId, @Param("problemName") String problemName,
                               @Param("problemText") String problemText, @Param("problemTime") long problemTime);
