@@ -44,10 +44,10 @@ public class ProblemsController {
     @GetMapping(path = "/{problemId}", produces = "application/json")
     public ResponseEntity getProblemById(@PathVariable long problemId) {
         Optional<Problem> problem = problemRepository.findById(problemId);
-        if(problem.isPresent()){
-            return new ResponseEntity(problem,HttpStatus.OK);
+        if (problem.isPresent()) {
+            return new ResponseEntity(problem, HttpStatus.OK);
         }
-        return new ResponseEntity<>("Problem with this id was not found",HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Problem with this id was not found", HttpStatus.NOT_FOUND);
     }
 
 
@@ -67,7 +67,7 @@ public class ProblemsController {
             return new ResponseEntity<>(errorDescription, HttpStatus.BAD_REQUEST);
         }
         Optional<Problem> problemTemp = problemRepository.findById(problemId);
-        if(problemTemp.isPresent()){
+        if (problemTemp.isPresent()) {
             problemRepository.updateProblem(problemId, problem.getProblemName(),
                     problem.getProblemText(), problem.getProblemTime());
             return new ResponseEntity<>("Problem was successfully updated", HttpStatus.OK);
@@ -78,7 +78,7 @@ public class ProblemsController {
     @DeleteMapping(path = "/{problemId}")
     public ResponseEntity deleteProblem(@PathVariable long problemId) {
         Optional<Problem> problemTemp = problemRepository.findById(problemId);
-        if(problemTemp.isPresent()) {
+        if (problemTemp.isPresent()) {
             problemRepository.deleteProblemFromAllCourses(problemId);
             problemRepository.deleteById(problemId);
             return new ResponseEntity<>("Problem was successfully deleted", HttpStatus.OK);

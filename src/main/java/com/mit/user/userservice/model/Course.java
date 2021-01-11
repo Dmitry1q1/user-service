@@ -15,7 +15,8 @@ public class Course {
     private String courseName;
 
     @OneToMany
-    @JoinTable(name = "course_problems", uniqueConstraints = {@UniqueConstraint(columnNames = {"problems_id","course_course_id"})},
+    @JoinTable(name = "course_problems",
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"problems_id","course_course_id"})},
             joinColumns = @JoinColumn(name = "course_course_id"),
             inverseJoinColumns = @JoinColumn(name = "problems_id"))
     private List<Problem> problems;
