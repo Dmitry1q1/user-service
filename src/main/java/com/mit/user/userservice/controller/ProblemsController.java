@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -47,7 +49,10 @@ public class ProblemsController {
         if (problem.isPresent()) {
             return new ResponseEntity(problem, HttpStatus.OK);
         }
-        return new ResponseEntity<>("Problem with this id was not found", HttpStatus.NOT_FOUND);
+        Map<Object, Object> errorModel = new HashMap<>();
+        errorModel.put("success", false);
+        errorModel.put("errorDescription", "Problem with this id was not found");
+        return new ResponseEntity<>(errorModel, HttpStatus.NOT_FOUND);
     }
 
 
@@ -64,15 +69,24 @@ public class ProblemsController {
             errorDescription.append("Problem's time must be > 0");
         }
         if (errorDescription.length() > 0) {
-            return new ResponseEntity<>(errorDescription, HttpStatus.BAD_REQUEST);
+            Map<Object, Object> errorModel = new HashMap<>();
+            errorModel.put("success", false);
+            errorModel.put("errorDescription", errorDescription);
+            return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
         }
         Optional<Problem> problemTemp = problemRepository.findById(problemId);
         if (problemTemp.isPresent()) {
             problemRepository.updateProblem(problemId, problem.getProblemName(),
                     problem.getProblemText(), problem.getProblemTime());
-            return new ResponseEntity<>("Problem was successfully updated", HttpStatus.OK);
+            Map<Object, Object> model = new HashMap<>();
+            model.put("success", true);
+            model.put("description", "Problem was successfully updated");
+            return new ResponseEntity<>(model, HttpStatus.OK);
         }
-        return new ResponseEntity<>("Problem with this id was not found", HttpStatus.BAD_REQUEST);
+        Map<Object, Object> errorModel = new HashMap<>();
+        errorModel.put("success", false);
+        errorModel.put("errorDescription", "Problem with this id was not found");
+        return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
     }
 
     @DeleteMapping(path = "/{problemId}")
@@ -81,9 +95,15 @@ public class ProblemsController {
         if (problemTemp.isPresent()) {
             problemRepository.deleteProblemFromAllCourses(problemId);
             problemRepository.deleteById(problemId);
-            return new ResponseEntity<>("Problem was successfully deleted", HttpStatus.OK);
+            Map<Object, Object> model = new HashMap<>();
+            model.put("success", true);
+            model.put("description", "Problem was successfully deleted");
+            return new ResponseEntity<>(model, HttpStatus.OK);
         }
-        return new ResponseEntity<>("Problem with this id was not found", HttpStatus.BAD_REQUEST);
+        Map<Object, Object> errorModel = new HashMap<>();
+        errorModel.put("success", false);
+        errorModel.put("errorDescription", "Problem with this id was not found");
+        return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
     }
 
 }

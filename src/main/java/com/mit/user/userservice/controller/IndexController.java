@@ -56,11 +56,16 @@ public class IndexController {
 
             Map<Object, Object> model = new HashMap<>();
             model.put("username", username);
+            model.put("userid", user.getId());
             model.put("token", token);
 
             return ok(model);
         } catch (AuthenticationException e) {
-            throw new BadCredentialsException("Invalid username/password supplied");
+//            throw new BadCredentialsException("Invalid username/password supplied");
+            Map<Object, Object> errorModel = new HashMap<>();
+            errorModel.put("success", false);
+            errorModel.put("errorDescription", "Invalid username/password supplied");
+            return new ResponseEntity<>(errorModel, HttpStatus.FORBIDDEN);
         }
     }
 
@@ -69,9 +74,15 @@ public class IndexController {
     public ResponseEntity addUser(@RequestBody UserDto user) {
         userService.registerUser(user);
         if (user.getErrorDescription() != null && !user.getErrorDescription().isEmpty()) {
-            return new ResponseEntity<>(user.getErrorDescription(), HttpStatus.BAD_REQUEST);
+            Map<Object, Object> errorModel = new HashMap<>();
+            errorModel.put("success", false);
+            errorModel.put("errorDescription", user.getErrorDescription());
+            return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>("Successful registration", HttpStatus.OK);
+        Map<Object, Object> model = new HashMap<>();
+        model.put("success", true);
+        model.put("description", "Successful registration");
+        return new ResponseEntity<>(model, HttpStatus.OK);
 
     }
 }

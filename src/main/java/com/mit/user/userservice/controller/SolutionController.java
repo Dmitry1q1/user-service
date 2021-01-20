@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -36,12 +38,21 @@ public class SolutionController {
                 LocalDateTime time = LocalDateTime.now();
                 solutionRepository.addSolution(solution.getUserId(), solution.getProblemId(), time,
                         solution.getSolutionText(), solution.getSolutionStatus(), solution.getStatusDescription());
-                return new ResponseEntity("Solution was successfully added", HttpStatus.OK);
+                Map<Object, Object> model = new HashMap<>();
+                model.put("success", true);
+                model.put("description", "Solution was successfully added");
+                return new ResponseEntity(model, HttpStatus.OK);
             } else {
-                return new ResponseEntity("Problem with this id was not found", HttpStatus.NOT_FOUND);
+                Map<Object, Object> errorModel = new HashMap<>();
+                errorModel.put("success", false);
+                errorModel.put("errorDescription", "Problem with this id was not found");
+                return new ResponseEntity(errorModel, HttpStatus.NOT_FOUND);
             }
         } else {
-            return new ResponseEntity("User with this id wasn't found", HttpStatus.BAD_REQUEST);
+            Map<Object, Object> errorModel = new HashMap<>();
+            errorModel.put("success", false);
+            errorModel.put("errorDescription", "User with this id was not found");
+            return new ResponseEntity(errorModel, HttpStatus.BAD_REQUEST);
         }
     }
 }
