@@ -4,6 +4,7 @@ import com.mit.user.userservice.component.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -29,16 +30,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-//                .antMatchers("/").permitAll()
+                //.antMatchers("/").permitAll()
+                .antMatchers("/courses/").permitAll()
+                .antMatchers("/login").permitAll()
+                .antMatchers("/registration").permitAll()
+                .antMatchers(HttpMethod.POST, "/courses/").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/courses/{\\d+}/").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, "/courses/{\\d+}/problems/?problemId={\\d+}").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/courses/{\\d+}/problems/?problemId={\\d+}").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, "/problems/").hasRole("ADMIN")
+                .antMatchers(HttpMethod.PUT, "/problems/{\\d+}").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/problems/{\\d+}").hasRole("ADMIN")
+                .antMatchers("/solution/").hasRole("ADMIN")
 //                .antMatchers("/courses/").permitAll()
-//                .antMatchers("/login").permitAll()
-//                .antMatchers("/registration").permitAll()
-////                .antMatchers("/courses/").permitAll()
-////                .antMatchers(HttpMethod.GET, "/vehicles/**").permitAll()
-//                .antMatchers(HttpMethod.DELETE, "/**").hasRole("ADMIN")
-////                .antMatchers(HttpMethod.GET, "/v1/vehicles/**").permitAll()
-//                .anyRequest().authenticated()
-                .anyRequest().permitAll()
+//                .antMatchers(HttpMethod.GET, "/vehicles/**").permitAll()
+//                .antMatchers(HttpMethod.DELETE, "/*/*").hasRole("ADMIN")
+//                .antMatchers(HttpMethod.GET, "/v1/vehicles/**").permitAll()
+                .anyRequest().authenticated()
+//                .anyRequest().permitAll()
                 .and()
                 .apply(new JwtConfigurer(jwtTokenProvider));
     }

@@ -1,10 +1,12 @@
 package com.mit.user.userservice.model;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
@@ -21,4 +23,8 @@ public interface UsersRepository extends CrudRepository<User, Long> {
     public List<String> getUserCourseById(@Param("userId") long userId);
 
 
+    @Modifying
+    @Query(value = "INSERT INTO user_roles (user_user_id, roles_id) VALUES (:userId,:roleId)", nativeQuery = true)
+    @Transactional
+    public void addRoleToUser(@Param("userId") long userId, @Param("roleId") long roleId);
 }

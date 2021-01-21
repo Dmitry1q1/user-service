@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/solution")
 public class SolutionController {
     private final SolutionRepository solutionRepository;

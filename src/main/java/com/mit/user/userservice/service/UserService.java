@@ -37,6 +37,7 @@ public class UserService implements IUserService {
         entity.setPassword(passwordEncoder.encode(user.getPassword()));
         if (user.getErrorDescription() == null) {
             usersRepository.save(entity);
+            user.setId(entity.getId());
         }
         return user;
     }

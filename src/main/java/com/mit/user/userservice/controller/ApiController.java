@@ -10,6 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/users")
 public class ApiController {
@@ -22,7 +23,6 @@ public class ApiController {
         this.usersRepository = usersRepository;
         this.userService = userService;
     }
-
 
     @GetMapping("/")
     public List<UserDto> getUsers(@RequestParam(required = false) String lastName) {

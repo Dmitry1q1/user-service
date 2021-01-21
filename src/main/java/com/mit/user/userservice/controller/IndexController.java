@@ -24,6 +24,7 @@ import java.util.Objects;
 
 import static org.springframework.http.ResponseEntity.ok;
 
+@CrossOrigin(origins = "*")
 @RestController
 public class IndexController {
     private final UsersRepository usersRepository;
@@ -40,6 +41,7 @@ public class IndexController {
         this.usersRepository = usersRepository;
         this.userService = userService;
     }
+
 
     @PostMapping(path = "/login")
     public ResponseEntity login(@RequestBody UserDto data) {
@@ -80,6 +82,7 @@ public class IndexController {
             return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
         }
         Map<Object, Object> model = new HashMap<>();
+        usersRepository.addRoleToUser(user.getId(), 2);
         model.put("success", true);
         model.put("description", "Successful registration");
         return new ResponseEntity<>(model, HttpStatus.OK);
