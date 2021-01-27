@@ -16,7 +16,8 @@ public interface UsersRepository extends CrudRepository<User, Long> {
 
 
     public List<User> findUserByLastName(@Param("last_name") String lastName);
-    public User findByUsername(@Param("username")String username);
+
+    public User findByUsername(@Param("username") String username);
 
     @Query(value = "SELECT co.course_name FROM users_courses uc " +
             "JOIN course co ON co.course_id = uc.course_id WHERE uc.user_id = :userId", nativeQuery = true)
@@ -27,4 +28,12 @@ public interface UsersRepository extends CrudRepository<User, Long> {
     @Query(value = "INSERT INTO user_roles (user_user_id, roles_id) VALUES (:userId,:roleId)", nativeQuery = true)
     @Transactional
     public void addRoleToUser(@Param("userId") long userId, @Param("roleId") long roleId);
+
+    @Modifying
+    @Query(value = "INSERT INTO token_storage (user_id, token) VALUES (:userId,:token)", nativeQuery = true)
+    @Transactional
+    public void sentToken(@Param("userId") long userId, @Param("token") String token);
+
+    @Query(value = "SELECT t_s.token FROM token_storage t_s WHERE token = :token", nativeQuery = true)
+    public String getToken(@Param("token") String token);
 }

@@ -31,11 +31,13 @@ public class CourseProblemsController {
         this.solutionRepository = solutionRepository;
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping(path = "/", produces = "application/json")
     public List<Problem> getAllProblemsFromCourse(@PathVariable long courseId) {
         return problemRepository.getAllProblemsFromCourse(courseId);
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping(path = "/{problemId}", produces = "application/json")
     public ResponseEntity getProblemById(@PathVariable long courseId, @PathVariable long problemId) {
         Optional<Problem> problem = problemRepository.getProblemById(courseId, problemId);
@@ -48,6 +50,7 @@ public class CourseProblemsController {
         return new ResponseEntity<>(errorModel, HttpStatus.NOT_FOUND);
     }
 
+    @CrossOrigin(origins = "*")
     @PostMapping(path = "/{problemId}/solution-file/", consumes = "multipart/form-data")
     public ResponseEntity addSolutionOnProblemAsFile(@RequestParam("file") MultipartFile file, @PathVariable long courseId,
                                                      @PathVariable long problemId, @RequestParam(name = "userId") long userId) {
@@ -86,6 +89,7 @@ public class CourseProblemsController {
         }
     }
 
+    @CrossOrigin(origins = "*")
     @PostMapping(path = "/{problemId}/solution-text/", consumes = "application/json")
     public ResponseEntity addSolutionOnProblemAsText(@RequestBody String solutionText, @PathVariable long courseId,
                                                      @PathVariable long problemId, @RequestParam(name = "userId") long userId) {
@@ -117,6 +121,7 @@ public class CourseProblemsController {
         }
     }
 
+    @CrossOrigin(origins = "*")
     @PostMapping(path = "/", consumes = "application/json")
     public ResponseEntity addProblemToCourse(@PathVariable long courseId,
                                              @RequestParam(name = "problemId") long problemId) {
@@ -149,6 +154,7 @@ public class CourseProblemsController {
         return new ResponseEntity<>(errorModel, HttpStatus.NOT_FOUND);
     }
 
+    @CrossOrigin(origins = "*")
     @DeleteMapping(path = "/")
     public ResponseEntity deleteProblemFromCourse(@PathVariable long courseId,
                                                   @RequestParam(name = "problemId") long problemId) {

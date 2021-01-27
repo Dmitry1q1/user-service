@@ -1,6 +1,7 @@
 package com.mit.user.userservice.component;
 
 import com.mit.user.userservice.model.Role;
+import com.mit.user.userservice.model.UsersRepository;
 import io.jsonwebtoken.*;
 //import io.jsonwebtoken.impl.crypto.MacProvider;
 import io.jsonwebtoken.io.Decoders;
@@ -27,10 +28,16 @@ public class JwtTokenProvider {
     @Value("${security.jwt.token.secret-key:secretKey}")
 //    private String secretKey = "KCkXtDAQa5wd+ztPksKizISaF4sW4YzCbFaPLfmv1U8=";
     private String secretKey;
-    @Value("${security.jwt.token.expire-length:600000}")
-    private long validityInMilliseconds; // 1h
+    @Value("${security.jwt.token.expire-length:1200000}")
+    private long validityInMilliseconds; // 20m
     @Autowired
     private UserDetailsService userDetailsService;
+
+    private final UsersRepository usersRepository;
+
+    public JwtTokenProvider(UsersRepository usersRepository) {
+        this.usersRepository = usersRepository;
+    }
 
     private String base64EncodedSecretKey;
     private Key key;
@@ -83,5 +90,38 @@ public class JwtTokenProvider {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    public String refreshToken(String token) {
+        final Date createdDate = new Date();
+        final Date expirationDate = calculateExpirationDate(createdDate);
+
+        final Claims claims = getAllClaimsFromToken(token);
+        claims.setIssuedAt(createdDate);
+        claims.setExpiration(expirationDate);
+
+        return Jwts.builder().setClaims(claims).signWith(key, SignatureAlgorithm.HS256).compact();
+    }
+
+    private Claims getAllClaimsFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(base64EncodedSecretKey)
+                .build()
+                .parseClaimsJws(token).getBody();
+    }
+
+    private Date calculateExpirationDate(Date createdDate) {
+        return new Date(createdDate.getTime() + validityInMilliseconds * 1000);
+    }
+
+    public Boolean isUserLoggedOut(String token){
+        String result = usersRepository.getToken(token);
+        if(result != null){
+            if(result.equals(token)){
+                return false;
+            }
+        }
+
+        return true;
     }
 }

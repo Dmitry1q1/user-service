@@ -14,9 +14,9 @@ import java.util.Map;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.http.ResponseEntity.ok;
 
-@CrossOrigin(origins = "*")
 @RestController()
 public class UserinfoController {
+    @CrossOrigin(origins = "*")
     @GetMapping("/me")
     public ResponseEntity currentUser(@AuthenticationPrincipal UserDetails userDetails){
         Map<Object, Object> model = new HashMap<>();

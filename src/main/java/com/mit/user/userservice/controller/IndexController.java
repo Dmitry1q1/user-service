@@ -1,30 +1,38 @@
 package com.mit.user.userservice.controller;
 
 import com.mit.user.userservice.component.JwtTokenProvider;
-import com.mit.user.userservice.model.*;
+import com.mit.user.userservice.model.User;
+import com.mit.user.userservice.model.UserDto;
+import com.mit.user.userservice.model.UsersRepository;
 import com.mit.user.userservice.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.provisioning.UserDetailsManager;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.management.remote.JMXAuthenticator;
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.security.Principal;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 import static org.springframework.http.ResponseEntity.ok;
 
-@CrossOrigin(origins = "*")
 @RestController
 public class IndexController {
     private final UsersRepository usersRepository;
@@ -42,7 +50,7 @@ public class IndexController {
         this.userService = userService;
     }
 
-
+    @CrossOrigin(origins = "*")
     @PostMapping(path = "/login")
     public ResponseEntity login(@RequestBody UserDto data) {
         try {
@@ -71,7 +79,30 @@ public class IndexController {
         }
     }
 
+    @CrossOrigin(origins = "*")
+    @PostMapping(path = "/logout")
+    public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 
+//        request.logout();
+//
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+////        auth.setAuthenticated(false);
+        if (auth != null) {
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+        jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(request));
+        usersRepository.sentToken(usersRepository.findByUsername(
+                jwtTokenProvider.getUsername(
+                        jwtTokenProvider.resolveToken(request))).getId(), jwtTokenProvider.resolveToken(request));
+
+//        if (session != null) {
+//            session.invalidate();
+//        }
+
+        return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
+    }
+
+    @CrossOrigin(origins = "*")
     @PostMapping(path = "/registration")
     public ResponseEntity addUser(@RequestBody UserDto user) {
         userService.registerUser(user);

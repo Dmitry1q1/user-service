@@ -10,7 +10,6 @@ import org.springframework.web.servlet.ModelAndView;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/users")
 public class ApiController {
@@ -24,6 +23,7 @@ public class ApiController {
         this.userService = userService;
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping("/")
     public List<UserDto> getUsers(@RequestParam(required = false) String lastName) {
         Iterable<User> users;
@@ -46,11 +46,13 @@ public class ApiController {
         return model;
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping("/{id}")
     public Optional<User> getUser(@PathVariable long id) {
         return usersRepository.findById(id);
     }
 
+    @CrossOrigin(origins = "*")
     @PostMapping(path = "/", consumes = "application/json", produces = "application/json")
     public ResponseEntity addUser(@RequestBody UserDto user) {
         userService.registerUser(user);
@@ -71,6 +73,7 @@ public class ApiController {
 //        return usersRepository.getUserByRecordBookNumber(recordBookNumber);
 //    }
 
+    @CrossOrigin(origins = "*")
     @GetMapping("/{userId}/courses/")
     public List<String> getUserCourses(@PathVariable Long userId) {
         return usersRepository.getUserCourseById(userId);
@@ -82,6 +85,7 @@ public class ApiController {
 //        return usersRepository.findUserByLastName(lastName);
 //    }
 
+    @CrossOrigin(origins = "*")
     @DeleteMapping("/{id}")
     public void deleteUserById(@PathVariable Long id) {
         usersRepository.deleteById(id);

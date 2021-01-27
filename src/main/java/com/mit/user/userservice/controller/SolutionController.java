@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/solution")
 public class SolutionController {
     private final SolutionRepository solutionRepository;
@@ -25,11 +24,13 @@ public class SolutionController {
         this.problemRepository = problemRepository;
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping(path = "/", produces = "application/json")
     public List<Solution> getAllSolutions() {
         return solutionRepository.getAllSolutions();
     }
 
+    @CrossOrigin(origins = "*")
     @PostMapping(path = "/", consumes = "application/json")
     public ResponseEntity<Solution> addSolution(@RequestBody Solution solution) {
         Optional<User> user = usersRepository.findById(solution.getUserId());

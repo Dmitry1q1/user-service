@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/courses")
 public class CoursesController {
@@ -21,6 +20,7 @@ public class CoursesController {
         this.usersRepository = usersRepository;
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping(path = "/", produces = "application/json")
     public Iterable<CourseDto> getCourse() {
         Iterable<Course> courses = coursesRepository.findAll();
@@ -34,12 +34,14 @@ public class CoursesController {
         return resultCourses;
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping(path = "/{courseId}", produces = "application/json")
     public Optional<CourseDto> getCourseById(@PathVariable long courseId) {
         Optional<Course> course = coursesRepository.findById(courseId);
         CourseDto resultCourse = null;
         if (course.isPresent()) {
             resultCourse = new CourseDto();
+            resultCourse.setId(courseId);
             resultCourse.setCourseName(course.get().getCourseName());
             List<Problem> problems = new ArrayList<>();
             for (Problem problem : course.get().getProblems()) {
@@ -51,24 +53,13 @@ public class CoursesController {
                 problems.add(problemDto);
             }
             resultCourse.setProblems(problems);
-//            List<User> users = new ArrayList<>();
-//            for (User user : course.get().getUsers()) {
-//                User userDto = new User();
-//                userDto.setId(user.getId());
-//                userDto.setFirstName(user.getFirstName());
-//                userDto.setLastName(user.getLastName());
-//                userDto.setRecordBookNumber(user.getRecordBookNumber());
-//                userDto.setUsername(user.getUsername());
-//                userDto.setRoles(user.getRoles());
-//                users.add(userDto);
-//            }
-//            resultCourse.setUsers(course.get().getUsers());
 
         }
 
         return Optional.ofNullable(resultCourse);
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping(path = "/{courseId}/users", produces = "application/json")
     public List<UserDto> getAllUsersFromCourse(@PathVariable long courseId){
         List<String> users = coursesRepository.getAllUsersFromCourses(courseId);
@@ -90,16 +81,19 @@ public class CoursesController {
         return model;
     }
 
+    @CrossOrigin(origins = "*")
     @PostMapping(path = "/", consumes = "application/json", produces = "application/json")
     public Course addCourse(@RequestBody Course course) {
         return coursesRepository.save(course);
     }
 
+    @CrossOrigin(origins = "*")
     @DeleteMapping(path = "/{id}")
     public void deleteCourse(@PathVariable long id) {
         coursesRepository.deleteById(id);
     }
 
+    @CrossOrigin(origins = "*")
     @PostMapping(path = "/{courseId}/", consumes = "application/json")
     public void addUserToCourse(@PathVariable long courseId, @RequestParam(name = "userId") long userId) {
         try {
@@ -116,6 +110,7 @@ public class CoursesController {
         }
     }
 
+    @CrossOrigin(origins = "*")
     @DeleteMapping(path = "/{courseId}/", consumes = "application/json")
     public void deleteUserFromCourse(@PathVariable long courseId, @RequestParam(name = "userId") long userId) {
         coursesRepository.deleteUserFromCourse(courseId, userId);

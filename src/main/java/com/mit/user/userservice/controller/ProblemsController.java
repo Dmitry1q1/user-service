@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/problems")
 public class ProblemsController {
@@ -20,11 +19,13 @@ public class ProblemsController {
         this.problemRepository = problemRepository;
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping(path = "/", produces = "application/json")
     public Iterable<Problem> getAllProblems() {
         return problemRepository.findAll();
     }
 
+    @CrossOrigin(origins = "*")
     @PostMapping(path = "/", consumes = "application/json")
     public ResponseEntity addProblem(@RequestBody Problem problem) {
         StringBuilder errorDescription = new StringBuilder();
@@ -44,6 +45,7 @@ public class ProblemsController {
         return new ResponseEntity<>(problemRepository.save(problem), HttpStatus.OK);
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping(path = "/{problemId}", produces = "application/json")
     public ResponseEntity getProblemById(@PathVariable long problemId) {
         Optional<Problem> problem = problemRepository.findById(problemId);
@@ -56,7 +58,7 @@ public class ProblemsController {
         return new ResponseEntity<>(errorModel, HttpStatus.NOT_FOUND);
     }
 
-
+    @CrossOrigin(origins = "*")
     @PutMapping(path = "/{problemId}")
     public ResponseEntity updateProblem(@PathVariable long problemId, @RequestBody Problem problem) {
         StringBuilder errorDescription = new StringBuilder();
@@ -90,6 +92,7 @@ public class ProblemsController {
         return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
     }
 
+    @CrossOrigin(origins = "*")
     @DeleteMapping(path = "/{problemId}")
     public ResponseEntity deleteProblem(@PathVariable long problemId) {
         Optional<Problem> problemTemp = problemRepository.findById(problemId);
