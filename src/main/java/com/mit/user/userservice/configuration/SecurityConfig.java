@@ -9,15 +9,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
     @Autowired
     JwtTokenProvider jwtTokenProvider;
@@ -38,12 +34,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .logout().disable()
-//                .logout()
-//                .and()
-//                .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-//                .logoutSuccessUrl("/courses/").deleteCookies("JSESSIONID")
-//                .invalidateHttpSession(true)
-//                .and()
                 .authorizeRequests()
 
                 .antMatchers("/").permitAll()
@@ -59,15 +49,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.PUT, "/problems/{\\d+}").hasRole("ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/problems/{\\d+}").hasRole("ADMIN")
                 .antMatchers("/solution/").hasRole("ADMIN")
-//                .antMatchers("/courses/").permitAll()
-//                .antMatchers(HttpMethod.GET, "/vehicles/**").permitAll()
-//                .antMatchers(HttpMethod.DELETE, "/*/*").hasRole("ADMIN")
-//                .antMatchers(HttpMethod.GET, "/v1/vehicles/**").permitAll()
                 .anyRequest().authenticated()
 //                .anyRequest().permitAll()
                 .and()
-                .apply(new JwtConfigurer(jwtTokenProvider));
+                .apply(new JwtConfigurator(jwtTokenProvider));
     }
 
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:3000/")
+                .allowedMethods("*")
+                .allowedHeaders("*")
+                .maxAge(-1)
+                .allowCredentials(true);
+    }
 }
 

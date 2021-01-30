@@ -27,8 +27,13 @@ public class CoursesController {
         List<CourseDto> resultCourses = new ArrayList<>();
         for (Course course : courses) {
             CourseDto courseDto = new CourseDto();
+            List<Long> authorsId = new ArrayList<>();
+            authorsId = coursesRepository.getCourseAuthorsByCourseId(course.getId());
             courseDto.setId(course.getId());
+            courseDto.setCourseAuthorsId(authorsId);
             courseDto.setCourseName(course.getCourseName());
+            courseDto.setCourseDescription(course.getCourseDescription());
+            courseDto.setCourseDuration(course.getCourseDuration());
             resultCourses.add(courseDto);
         }
         return resultCourses;
@@ -41,8 +46,13 @@ public class CoursesController {
         CourseDto resultCourse = null;
         if (course.isPresent()) {
             resultCourse = new CourseDto();
+            List<Long> authorsId = new ArrayList<>();
+            authorsId = coursesRepository.getCourseAuthorsByCourseId(courseId);
+            resultCourse.setCourseAuthorsId(authorsId);
             resultCourse.setId(courseId);
             resultCourse.setCourseName(course.get().getCourseName());
+            resultCourse.setCourseDescription(course.get().getCourseDescription());
+            resultCourse.setCourseDuration(course.get().getCourseDuration());
             List<Problem> problems = new ArrayList<>();
             for (Problem problem : course.get().getProblems()) {
                 Problem problemDto = new Problem();
@@ -61,14 +71,14 @@ public class CoursesController {
 
     @CrossOrigin(origins = "*")
     @GetMapping(path = "/{courseId}/users", produces = "application/json")
-    public List<UserDto> getAllUsersFromCourse(@PathVariable long courseId){
+    public List<UserDto> getAllUsersFromCourse(@PathVariable long courseId) {
         List<String> users = coursesRepository.getAllUsersFromCourses(courseId);
         List<UserDto> model = new ArrayList<>();
         for (String user : users) {
             UserDto tempUser = new UserDto();
             String[] words = user.split(",");
 
-            tempUser.setId(Long.valueOf(words[0]));
+            tempUser.setId(Long.parseLong(words[0]));
             tempUser.setFirstName(words[1]);
             tempUser.setLastName(words[2]);
             tempUser.setRecordBookNumber(words[4]);
@@ -83,8 +93,18 @@ public class CoursesController {
 
     @CrossOrigin(origins = "*")
     @PostMapping(path = "/", consumes = "application/json", produces = "application/json")
-    public Course addCourse(@RequestBody Course course) {
-        return coursesRepository.save(course);
+    public Course addCourse(@RequestBody CourseDto courseDto) {
+        Course course = new Course();
+        course.setCourseName(courseDto.getCourseName());
+        course.setCourseDescription(courseDto.getCourseDescription());
+        course.setCourseDuration(courseDto.getCourseDuration());
+        Course resultCourse = coursesRepository.save(course);
+        for (Long index : courseDto.getCourseAuthorsId()) {
+            Optional<User> users = usersRepository.findById(index);
+            users.ifPresent(user -> coursesRepository.addCourseAuthors(resultCourse.getId(), user.getId()));
+        }
+
+        return resultCourse;
     }
 
     @CrossOrigin(origins = "*")

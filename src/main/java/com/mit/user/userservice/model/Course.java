@@ -16,13 +16,35 @@ public class Course {
 
     @OneToMany
     @JoinTable(name = "course_problems",
-            uniqueConstraints = {@UniqueConstraint(columnNames = {"problems_id","course_course_id"})},
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"problems_id", "course_course_id"})},
             joinColumns = @JoinColumn(name = "course_course_id"),
             inverseJoinColumns = @JoinColumn(name = "problems_id"))
     private List<Problem> problems;
 
     @ManyToMany(mappedBy = "courses")
     private List<User> users;
+
+    @Column(name = "course_description")
+    private String courseDescription;
+
+    @Column(name = "course_duration")
+    private String courseDuration;
+
+    public String getCourseDescription() {
+        return courseDescription;
+    }
+
+    public void setCourseDescription(String courseDescription) {
+        this.courseDescription = courseDescription;
+    }
+
+    public String getCourseDuration() {
+        return courseDuration;
+    }
+
+    public void setCourseDuration(String courseDuration) {
+        this.courseDuration = courseDuration;
+    }
 
     public long getId() {
         return id;

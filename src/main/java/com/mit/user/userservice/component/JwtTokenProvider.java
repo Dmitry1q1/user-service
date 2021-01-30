@@ -3,9 +3,6 @@ package com.mit.user.userservice.component;
 import com.mit.user.userservice.model.Role;
 import com.mit.user.userservice.model.UsersRepository;
 import io.jsonwebtoken.*;
-//import io.jsonwebtoken.impl.crypto.MacProvider;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +19,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Component
 public class JwtTokenProvider {

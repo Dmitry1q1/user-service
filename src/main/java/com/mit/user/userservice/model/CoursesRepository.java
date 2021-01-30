@@ -35,4 +35,12 @@ public interface CoursesRepository extends CrudRepository<Course, Long> {
     @Query(value="SELECT * FROM course co WHERE co.course_id = :courseId", nativeQuery = true)
     public Optional<Course> getCourseById(@Param("courseId") long courseId);
 
+    @Query(value="SELECT * FROM course_authors ca WHERE ca.course_id = :courseId", nativeQuery = true)
+    public List<Long> getCourseAuthorsByCourseId(@Param("courseId") long courseId);
+
+    @Modifying
+    @Query(value = "INSERT INTO course_authors (user_id, course_id) VALUES (:userId, :courseId)", nativeQuery = true)
+    @Transactional
+    public void addCourseAuthors(@Param("courseId") long courseId, @Param("userId") long userId);
+
 }

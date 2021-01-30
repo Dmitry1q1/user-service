@@ -24,7 +24,7 @@ public class ApiController {
     }
 
     @CrossOrigin(origins = "*")
-    @GetMapping("/")
+    @GetMapping(path = "/")
     public List<UserDto> getUsers(@RequestParam(required = false) String lastName) {
         Iterable<User> users;
         if (lastName != null && !lastName.isEmpty()) {
