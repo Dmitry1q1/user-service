@@ -58,8 +58,10 @@ public class IndexController {
             if (Objects.isNull(user = usersRepository.findByUsername(username))) {
                 throw new UsernameNotFoundException("Username: " + username + " not found");
             }
-            String token = jwtTokenProvider.createToken(username, user.getRoles());
+            String token = jwtTokenProvider.createToken(username, user.getRoles(), user.getId());
 
+//            System.out.println(jwtTokenProvider.getUserId(token));
+            usersRepository.sentToken(user.getId(), token);
             Map<Object, Object> model = new HashMap<>();
             model.put("username", username);
             model.put("userid", user.getId());
@@ -79,23 +81,21 @@ public class IndexController {
     @PostMapping(path = "/logout")
     public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 
-//        request.logout();
-//
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 ////        auth.setAuthenticated(false);
         if (auth != null) {
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
-        jwtTokenProvider.getUsername(jwtTokenProvider.resolveToken(request));
-        usersRepository.sentToken(usersRepository.findByUsername(
-                jwtTokenProvider.getUsername(
-                        jwtTokenProvider.resolveToken(request))).getId(), jwtTokenProvider.resolveToken(request));
+        String token = jwtTokenProvider.resolveToken(request);
+        jwtTokenProvider.getUsername(token);
+        usersRepository.deleteToken(token);
 
 //        if (session != null) {
 //            session.invalidate();
 //        }
-
-        return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
+        Map<Object, Object> model = new HashMap<>();
+        model.put("success", true);
+        return new ResponseEntity<>(model, HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "*")

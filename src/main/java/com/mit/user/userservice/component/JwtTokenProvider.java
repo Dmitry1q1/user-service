@@ -46,10 +46,11 @@ public class JwtTokenProvider {
         key = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    public String createToken(String username, List<Role> roles) {
+    public String createToken(String username, List<Role> roles, Long id) {
         List<String> roleList = roles.stream().map(Role::getName).collect(Collectors.toList());
         Claims claims = Jwts.claims().setSubject(username);
         claims.put("roles", roleList);
+        claims.put("id", id.toString());
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
@@ -68,6 +69,10 @@ public class JwtTokenProvider {
 
     public String getUsername(String token) {
         return Jwts.parserBuilder().setSigningKey(base64EncodedSecretKey).build().parseClaimsJws(token).getBody().getSubject();
+    }
+
+    public String getUserId(String token){
+        return Jwts.parserBuilder().setSigningKey(base64EncodedSecretKey).build().parseClaimsJws(token).getBody().get("id").toString();
     }
 
     public String resolveToken(HttpServletRequest req) {
@@ -112,14 +117,18 @@ public class JwtTokenProvider {
         return new Date(createdDate.getTime() + validityInMilliseconds * 1000);
     }
 
-    public Boolean isUserLoggedOut(String token){
+    public Boolean isUserLoggedIn(String token) {
         String result = usersRepository.getToken(token);
-        if(result != null){
-            if(result.equals(token)){
-                return false;
-            }
-        }
+        return result != null && result.equals(token);
+    }
 
-        return true;
+    public void clearToken(String token) {
+        usersRepository.deleteToken(token);
+    }
+
+    public Boolean validateUsersData(HttpServletRequest request, Long userId){
+        String token = resolveToken(request);
+        long currentUserId = Long.parseLong(getUserId(token));
+        return currentUserId == userId;
     }
 }

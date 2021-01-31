@@ -1,11 +1,14 @@
 package com.mit.user.userservice.controller;
 
+import com.mit.user.userservice.component.JwtTokenProvider;
 import com.mit.user.userservice.model.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -21,6 +24,9 @@ public class CourseProblemsController {
     private final CoursesRepository coursesRepository;
     private final UsersRepository usersRepository;
     private final SolutionRepository solutionRepository;
+
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
     public CourseProblemsController(ProblemRepository problemRepository,
                                     CoursesRepository coursesRepository, UsersRepository usersRepository,
@@ -52,14 +58,17 @@ public class CourseProblemsController {
 
     @CrossOrigin(origins = "*")
     @PostMapping(path = "/{problemId}/solution-file/", consumes = "multipart/form-data")
-    public ResponseEntity addSolutionOnProblemAsFile(@RequestParam("file") MultipartFile file, @PathVariable long courseId,
+    public ResponseEntity addSolutionOnProblemAsFile(HttpServletRequest request, @RequestParam("file") MultipartFile file, @PathVariable long courseId,
                                                      @PathVariable long problemId, @RequestParam(name = "userId") long userId) {
         Map<Object, Object> errorModel = new HashMap<>();
         errorModel.put("success", false);
-
+        if (!jwtTokenProvider.validateUsersData(request, userId)) {
+            errorModel.put("errorDescription", "Wrong id. Forbidden");
+            return new ResponseEntity<>(errorModel, HttpStatus.FORBIDDEN);
+        }
         if (file.isEmpty()) {
             errorModel.put("errorDescription", "Empty file");
-            return new ResponseEntity(errorModel, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
         }
         Optional<User> user = usersRepository.findById(userId);
         if (user.isPresent()) {
@@ -73,32 +82,37 @@ public class CourseProblemsController {
                     Solution solution = new Solution(userId, problemId, LocalDateTime.now(),
                             solutionText, "OK", "OK");
 
-                    return new ResponseEntity(solutionRepository.save(solution), HttpStatus.OK);
+                    return new ResponseEntity<>(solutionRepository.save(solution), HttpStatus.OK);
                 } catch (IOException e) {
                     errorModel.put("errorDescription", e.getMessage());
-                    return new ResponseEntity(errorModel, HttpStatus.CONFLICT);
+                    return new ResponseEntity<>(errorModel, HttpStatus.CONFLICT);
                 }
 
             } else {
                 errorModel.put("errorDescription", "Problem with this id was not found");
-                return new ResponseEntity(errorModel, HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
             }
         } else {
             errorModel.put("errorDescription", "User with this id was not found");
-            return new ResponseEntity(errorModel, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
         }
     }
 
     @CrossOrigin(origins = "*")
     @PostMapping(path = "/{problemId}/solution-text/", consumes = "application/json")
-    public ResponseEntity addSolutionOnProblemAsText(@RequestBody String solutionText, @PathVariable long courseId,
+    public ResponseEntity addSolutionOnProblemAsText(HttpServletRequest request, @RequestBody String solutionText, @PathVariable long courseId,
                                                      @PathVariable long problemId, @RequestParam(name = "userId") long userId) {
         Map<Object, Object> errorModel = new HashMap<>();
         errorModel.put("success", false);
 
+        if (!jwtTokenProvider.validateUsersData(request, userId)) {
+            errorModel.put("errorDescription", "Wrong id. Forbidden");
+            return new ResponseEntity<>(errorModel, HttpStatus.FORBIDDEN);
+        }
+
         if (solutionText.isEmpty()) {
             errorModel.put("errorDescription", "solutionText not found");
-            return new ResponseEntity(errorModel, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
         }
         Optional<User> user = usersRepository.findById(userId);
         if (user.isPresent()) {
@@ -109,15 +123,15 @@ public class CourseProblemsController {
                 Solution solution = new Solution(userId, problemId, LocalDateTime.now(),
                         solutionText, "OK", "OK");
 
-                return new ResponseEntity(solutionRepository.save(solution), HttpStatus.OK);
+                return new ResponseEntity<>(solutionRepository.save(solution), HttpStatus.OK);
 
             } else {
                 errorModel.put("errorDescription", "Problem with this id was not found");
-                return new ResponseEntity(errorModel, HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
             }
         } else {
             errorModel.put("errorDescription", "User with this id was not found");
-            return new ResponseEntity(errorModel, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -135,12 +149,12 @@ public class CourseProblemsController {
                     Map<Object, Object> model = new HashMap<>();
                     model.put("success", true);
                     model.put("description", "Problem was successfully added");
-                    return new ResponseEntity(model, HttpStatus.OK);
+                    return new ResponseEntity<>(model, HttpStatus.OK);
                 } else {
                     Map<Object, Object> errorModel = new HashMap<>();
                     errorModel.put("success", false);
                     errorModel.put("errorDescription", "We already have this problem on this course");
-                    return new ResponseEntity(errorModel, HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
                 }
             }
             Map<Object, Object> errorModel = new HashMap<>();

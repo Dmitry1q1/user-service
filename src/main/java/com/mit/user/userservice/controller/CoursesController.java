@@ -1,19 +1,25 @@
 package com.mit.user.userservice.controller;
 
+import com.mit.user.userservice.component.JwtTokenProvider;
 import com.mit.user.userservice.model.*;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 @RestController
 @RequestMapping("/courses")
 public class CoursesController {
     final private CoursesRepository coursesRepository;
     final private UsersRepository usersRepository;
+
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
     public CoursesController(CoursesRepository coursesRepository, UsersRepository usersRepository) {
         this.coursesRepository = coursesRepository;
@@ -115,24 +121,51 @@ public class CoursesController {
 
     @CrossOrigin(origins = "*")
     @PostMapping(path = "/{courseId}/", consumes = "application/json")
-    public void addUserToCourse(@PathVariable long courseId, @RequestParam(name = "userId") long userId) {
+    public ResponseEntity addUserToCourse(HttpServletRequest request, @PathVariable long courseId, @RequestParam(name = "userId") long userId) {
+        Map<Object, Object> errorModel = new HashMap<>();
+        errorModel.put("success", false);
+        if (!jwtTokenProvider.validateUsersData(request, userId)) {
+            errorModel.put("errorDescription", "Wrong id. Forbidden");
+            return new ResponseEntity<>(errorModel, HttpStatus.FORBIDDEN);
+        }
+
         try {
+            Map<Object, Object> model = new HashMap<>();
+            model.put("success", true);
+            model.put("description", "User was successfully added to course");
             coursesRepository.addUserToCourse(courseId, userId);
+            return new ResponseEntity<>(model, HttpStatus.OK);
         } catch (DataIntegrityViolationException e) {
             if (e.getCause() instanceof ConstraintViolationException) {
                 ConstraintViolationException exception = (ConstraintViolationException) e.getCause();
                 if (!exception.getConstraintName().equals("PRIMARY")) {
-                    throw e;
+                    errorModel.put("errorDescription", e.getMessage());
+                    return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
+//                    throw e;
                 }
             } else {
-                throw e;
+                errorModel.put("errorDescription", e.getMessage());
+                return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
+//                throw e;
             }
         }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @CrossOrigin(origins = "*")
     @DeleteMapping(path = "/{courseId}/", consumes = "application/json")
-    public void deleteUserFromCourse(@PathVariable long courseId, @RequestParam(name = "userId") long userId) {
+    public ResponseEntity deleteUserFromCourse(HttpServletRequest request, @PathVariable long courseId, @RequestParam(name = "userId") long userId) {
+        Map<Object, Object> errorModel = new HashMap<>();
+        errorModel.put("success", false);
+        if (!jwtTokenProvider.validateUsersData(request, userId)) {
+            errorModel.put("errorDescription", "Wrong id. Forbidden");
+            return new ResponseEntity<>(errorModel, HttpStatus.FORBIDDEN);
+        }
         coursesRepository.deleteUserFromCourse(courseId, userId);
+        Map<Object, Object> model = new HashMap<>();
+        model.put("success", true);
+        model.put("description", "User was successfully deleted from course");
+        return new ResponseEntity<>(model, HttpStatus.OK);
+
     }
 }

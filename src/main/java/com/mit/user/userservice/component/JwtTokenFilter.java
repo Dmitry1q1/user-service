@@ -11,7 +11,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-public class JwtTokenFilter  extends GenericFilterBean {
+public class JwtTokenFilter extends GenericFilterBean {
 
     private JwtTokenProvider jwtTokenProvider;
 
@@ -24,9 +24,16 @@ public class JwtTokenFilter  extends GenericFilterBean {
             throws IOException, ServletException {
 
         String token = jwtTokenProvider.resolveToken((HttpServletRequest) req);
-        if (token != null && jwtTokenProvider.validateToken(token) && jwtTokenProvider.isUserLoggedOut(token)) {
-            Authentication auth =  jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(auth);
+        if (token != null) {
+            if (jwtTokenProvider.validateToken(token)) {
+                if (jwtTokenProvider.isUserLoggedIn(token)) {
+                    Authentication auth = jwtTokenProvider.getAuthentication(token);
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+            } else {
+                jwtTokenProvider.clearToken(token);
+            }
+
         }
         filterChain.doFilter(req, res);
     }
