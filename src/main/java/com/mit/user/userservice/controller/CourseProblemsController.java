@@ -80,7 +80,7 @@ public class CourseProblemsController {
                     String solutionText = new String(text);
 
                     Solution solution = new Solution(userId, problemId, LocalDateTime.now(),
-                            solutionText, "OK", "OK");
+                            solutionText, "NOT OK", "Ready to compile");
 
                     return new ResponseEntity<>(solutionRepository.save(solution), HttpStatus.OK);
                 } catch (IOException e) {
@@ -121,7 +121,7 @@ public class CourseProblemsController {
 
 
                 Solution solution = new Solution(userId, problemId, LocalDateTime.now(),
-                        solutionText, "OK", "OK");
+                        solutionText, "NOT OK", "Ready to compile");
 
                 return new ResponseEntity<>(solutionRepository.save(solution), HttpStatus.OK);
 

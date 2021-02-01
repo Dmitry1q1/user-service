@@ -39,7 +39,6 @@ public class IndexController {
     @Autowired
     JwtTokenProvider jwtTokenProvider;
 
-
     public IndexController(UsersRepository usersRepository,
                            IUserService userService) {
         this.usersRepository = usersRepository;
@@ -60,7 +59,6 @@ public class IndexController {
             }
             String token = jwtTokenProvider.createToken(username, user.getRoles(), user.getId());
 
-//            System.out.println(jwtTokenProvider.getUserId(token));
             usersRepository.sentToken(user.getId(), token);
             Map<Object, Object> model = new HashMap<>();
             model.put("username", username);
@@ -69,7 +67,6 @@ public class IndexController {
 
             return ok(model);
         } catch (AuthenticationException e) {
-//            throw new BadCredentialsException("Invalid username/password supplied");
             Map<Object, Object> errorModel = new HashMap<>();
             errorModel.put("success", false);
             errorModel.put("errorDescription", "Invalid username/password supplied");
@@ -82,7 +79,6 @@ public class IndexController {
     public ResponseEntity logout(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-////        auth.setAuthenticated(false);
         if (auth != null) {
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
