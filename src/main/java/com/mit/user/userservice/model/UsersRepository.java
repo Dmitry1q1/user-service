@@ -38,7 +38,7 @@ public interface UsersRepository extends CrudRepository<User, Long> {
     public String getToken(@Param("token") String token);
 
     @Modifying
-    @Query(value = "DELETE FROM token_storage t_s WHERE token = :token", nativeQuery = true)
+    @Query(value = "DELETE FROM token_storage WHERE token_storage.token = :token", nativeQuery = true)
     @Transactional
     public void deleteToken(@Param("token") String token);
 }
