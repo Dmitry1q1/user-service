@@ -28,6 +28,9 @@ public class User implements UserDetails {
 //    @Size(min=5, message = "Не меньше 5 знаков")
     private String password;
 
+    @Column(name = "user_description")
+    private String userDescription;
+
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
 
@@ -56,11 +59,19 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
-    @ManyToMany
-    @JoinTable(name = "UsersCourses", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id","course_id"})},
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "course_id"))
-    private List<Course> courses;
+    public String getUserDescription() {
+        return userDescription;
+    }
+
+    public void setUserDescription(String userDescription) {
+        this.userDescription = userDescription;
+    }
+
+    //    @ManyToMany
+//    @JoinTable(name = "UsersCourses", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id","course_id"})},
+//            joinColumns = @JoinColumn(name = "user_id"),
+//            inverseJoinColumns = @JoinColumn(name = "course_id"))
+//    private List<Course> courses;
 
     public long getId() {
         return id;
@@ -94,13 +105,13 @@ public class User implements UserDetails {
         this.recordBookNumber = recordBookNumber;
     }
 
-    public List<Course> getCourses() {
-        return courses;
-    }
-
-    public void setCourses(List<Course> courses) {
-        this.courses = courses;
-    }
+//    public List<Course> getCourses() {
+//        return courses;
+//    }
+//
+//    public void setCourses(List<Course> courses) {
+//        this.courses = courses;
+//    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -43,6 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
                 .antMatchers("/logout").permitAll()
                 .antMatchers(HttpMethod.POST, "/courses/").hasRole("ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/users/{\\d+}").hasRole("ADMIN")
+//                .antMatchers(HttpMethod.DELETE, "/users/{\\d+}").hasAnyRole("","")
                 .antMatchers(HttpMethod.DELETE, "/courses/{\\d+}").hasRole("ADMIN")
 //                .antMatchers(HttpMethod.DELETE, "/courses/{\\d+}/?userId={\\d+}").hasRole("ADMIN")
                 .antMatchers(HttpMethod.POST, "/courses/{\\d+}/problems/?problemId={\\d+}").hasRole("ADMIN")

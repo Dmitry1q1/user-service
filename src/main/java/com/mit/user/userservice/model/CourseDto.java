@@ -8,7 +8,7 @@ public class CourseDto {
     private String courseDescription;
     private String courseDuration;
     private List<Problem> problems;
-    private List<User> users;
+//    private List<User> users;
     private List<Long> courseAuthorsId;
 
     public List<Long> getCourseAuthorsId() {
@@ -43,13 +43,13 @@ public class CourseDto {
         this.problems = problems;
     }
 
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
+//    public List<User> getUsers() {
+//        return users;
+//    }
+//
+//    public void setUsers(List<User> users) {
+//        this.users = users;
+//    }
 
     public String getCourseDescription() {
         return courseDescription;

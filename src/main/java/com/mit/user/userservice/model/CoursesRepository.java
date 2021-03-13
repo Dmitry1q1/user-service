@@ -23,24 +23,27 @@ public interface CoursesRepository extends CrudRepository<Course, Long> {
     @Transactional
     public void deleteUserFromCourse(@Param("courseId") long courseId, @Param("userId") long userId);
 
-    @Query(value = "SELECT pm.problem_name, pm.problem_text FROM problem pm JOIN course_problems cp ON cp.problems_id = pm.id" +
-            " WHERE cp.course_course_id = :courseId", nativeQuery = true)
-    public List<String> getAllProblemsFromCourse(@Param("courseId") long courseId);
+    @Query(value = "SELECT co.course_id, co.course_name, co.course_description, co.course_duration " +
+            "FROM users_courses uc " +
+            "JOIN course co ON co.course_id = uc.course_id WHERE uc.user_id = :userId", nativeQuery = true)
+    List<Course> getUserCoursesById(@Param("userId") long userId);
+
+
 
     @Query(value = "SELECT u.user_id, u.first_name, u.last_name, u.username, u.record_book_number" +
             " FROM user u JOIN users_courses uc ON" +
             " uc.user_id = u.user_id WHERE uc.course_id = :courseId", nativeQuery = true)
-    public List<String> getAllUsersFromCourses(@Param("courseId") long courseId);
+    List<String> getAllUsersFromCourses(@Param("courseId") long courseId);
 
     @Query(value="SELECT * FROM course co WHERE co.course_id = :courseId", nativeQuery = true)
-    public Optional<Course> getCourseById(@Param("courseId") long courseId);
+    Optional<Course> getCourseById(@Param("courseId") long courseId);
 
     @Query(value="SELECT * FROM course_authors ca WHERE ca.course_id = :courseId", nativeQuery = true)
-    public List<Long> getCourseAuthorsByCourseId(@Param("courseId") long courseId);
+    List<Long> getCourseAuthorsByCourseId(@Param("courseId") long courseId);
 
     @Modifying
     @Query(value = "INSERT INTO course_authors (user_id, course_id) VALUES (:userId, :courseId)", nativeQuery = true)
     @Transactional
-    public void addCourseAuthors(@Param("courseId") long courseId, @Param("userId") long userId);
+    void addCourseAuthors(@Param("courseId") long courseId, @Param("userId") long userId);
 
 }

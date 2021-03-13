@@ -9,20 +9,20 @@ public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "course_id")
-    private long id;
+    private Long id;
 
     @Column(name = "course_name")
     private String courseName;
 
-    @OneToMany
-    @JoinTable(name = "course_problems",
-            uniqueConstraints = {@UniqueConstraint(columnNames = {"problems_id", "course_course_id"})},
-            joinColumns = @JoinColumn(name = "course_course_id"),
-            inverseJoinColumns = @JoinColumn(name = "problems_id"))
-    private List<Problem> problems;
-
-    @ManyToMany(mappedBy = "courses")
-    private List<User> users;
+//    @OneToMany
+//    @JoinTable(name = "course_problems",
+//            uniqueConstraints = {@UniqueConstraint(columnNames = {"problems_id", "course_course_id"})},
+//            joinColumns = @JoinColumn(name = "course_course_id"),
+//            inverseJoinColumns = @JoinColumn(name = "problems_id"))
+//    private List<Problem> problems;
+//
+//    @ManyToMany(mappedBy = "courses")
+//    private List<User> users;
 
     @Column(name = "course_description")
     private String courseDescription;
@@ -62,19 +62,19 @@ public class Course {
         this.courseName = courseName;
     }
 
-    public List<Problem> getProblems() {
-        return problems;
-    }
-
-    public void setProblems(List<Problem> problems) {
-        this.problems = problems;
-    }
-
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
+//    public List<Problem> getProblems() {
+//        return problems;
+//    }
+//
+//    public void setProblems(List<Problem> problems) {
+//        this.problems = problems;
+//    }
+//
+//    public List<User> getUsers() {
+//        return users;
+//    }
+//
+//    public void setUsers(List<User> users) {
+//        this.users = users;
+//    }
 }

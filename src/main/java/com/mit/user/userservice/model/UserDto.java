@@ -11,6 +11,7 @@ public class UserDto {
     private String passwordConfirm;
     private String errorDescription;
     private String recordBookNumber;
+    private String userDescription;
     private List<Role> roles;
 
     public List<Role> getRoles() {
@@ -63,6 +64,14 @@ public class UserDto {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getUserDescription() {
+        return userDescription;
+    }
+
+    public void setUserDescription(String userDescription) {
+        this.userDescription = userDescription;
     }
 
     public void setPassword(String password) {
