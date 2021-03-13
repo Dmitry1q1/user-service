@@ -83,7 +83,7 @@ public class IndexController {
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
         String token = jwtTokenProvider.resolveToken(request);
-        jwtTokenProvider.getUsername(token);
+//        jwtTokenProvider.getUsername(token);
         usersRepository.deleteToken(token);
 
 //        if (session != null) {

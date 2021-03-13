@@ -71,8 +71,8 @@ public class JwtTokenProvider {
         return Jwts.parserBuilder().setSigningKey(base64EncodedSecretKey).build().parseClaimsJws(token).getBody().getSubject();
     }
 
-    public String getUserId(String token){
-        return Jwts.parserBuilder().setSigningKey(base64EncodedSecretKey).build().parseClaimsJws(token).getBody().get("id").toString();
+    public Long getUserId(String token){
+        return Long.parseLong(Jwts.parserBuilder().setSigningKey(base64EncodedSecretKey).build().parseClaimsJws(token).getBody().get("id").toString());
     }
 
     public String resolveToken(HttpServletRequest req) {
@@ -128,7 +128,7 @@ public class JwtTokenProvider {
 
     public Boolean validateUsersData(HttpServletRequest request, Long userId){
         String token = resolveToken(request);
-        long currentUserId = Long.parseLong(getUserId(token));
+        long currentUserId = getUserId(token);
         return currentUserId == userId;
     }
 }
