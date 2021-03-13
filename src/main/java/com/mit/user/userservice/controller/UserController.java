@@ -54,6 +54,29 @@ public class UserController {
     }
 
     @CrossOrigin(origins = "*")
+    @GetMapping("/token")
+    public ResponseEntity getUserByToken(HttpServletRequest request){
+        String token = jwtTokenProvider.resolveToken(request);
+        Long userId = jwtTokenProvider.getUserId(token);
+
+        Optional<User> user = usersRepository.findUserById(userId);
+        if (user.isPresent()) {
+
+            Map<Object, Object> model = new LinkedHashMap<>();
+            model.put("success", true);
+            model.put("user", user.get());
+            List<Course> userCourses = coursesRepository.getUserCoursesById(userId);
+            model.put("userCourses", userCourses);
+            return new ResponseEntity(model, HttpStatus.OK);
+        } else {
+            Map<Object, Object> errorModel = new HashMap<>();
+            errorModel.put("success", false);
+            errorModel.put("errorDescription", "There was not found any users with this id");
+            return new ResponseEntity(errorModel, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @CrossOrigin(origins = "*")
     @GetMapping("/{id}")
     public ResponseEntity getUser(@PathVariable long id) {
         Optional<User> user = usersRepository.findUserById(id);
