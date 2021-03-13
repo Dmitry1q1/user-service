@@ -17,13 +17,16 @@ import java.util.*;
 public class CoursesController {
     final private CoursesRepository coursesRepository;
     final private UsersRepository usersRepository;
+    final private ProblemRepository problemRepository;
 
     @Autowired
     JwtTokenProvider jwtTokenProvider;
 
-    public CoursesController(CoursesRepository coursesRepository, UsersRepository usersRepository) {
+    public CoursesController(CoursesRepository coursesRepository, UsersRepository usersRepository,
+                             ProblemRepository problemRepository) {
         this.coursesRepository = coursesRepository;
         this.usersRepository = usersRepository;
+        this.problemRepository = problemRepository;
     }
 
     @CrossOrigin(origins = "*")
@@ -47,32 +50,31 @@ public class CoursesController {
 
     @CrossOrigin(origins = "*")
     @GetMapping(path = "/{courseId}", produces = "application/json")
-    public Optional<CourseDto> getCourseById(@PathVariable long courseId) {
+    public ResponseEntity getCourseById(@PathVariable long courseId) {
         Optional<Course> course = coursesRepository.findById(courseId);
+
         CourseDto resultCourse = null;
         if (course.isPresent()) {
             resultCourse = new CourseDto();
-            List<Long> authorsId = new ArrayList<>();
-            authorsId = coursesRepository.getCourseAuthorsByCourseId(courseId);
+            List<Long> authorsId = coursesRepository.getCourseAuthorsByCourseId(courseId);
             resultCourse.setCourseAuthorsId(authorsId);
             resultCourse.setId(courseId);
             resultCourse.setCourseName(course.get().getCourseName());
             resultCourse.setCourseDescription(course.get().getCourseDescription());
             resultCourse.setCourseDuration(course.get().getCourseDuration());
-            List<Problem> problems = new ArrayList<>();
-            for (Problem problem : course.get().getProblems()) {
-                Problem problemDto = new Problem();
-                problemDto.setId(problem.getId());
-                problemDto.setProblemName(problem.getProblemName());
-                problemDto.setProblemText(problem.getProblemText());
-                problemDto.setProblemTime(problem.getProblemTime());
-                problems.add(problemDto);
-            }
+            List<Problem> problems = problemRepository.getAllProblemsFromCourse(courseId);
             resultCourse.setProblems(problems);
 
+            Map<Object, Object> model = new HashMap<>();
+            model.put("success", true);
+            model.put("course", resultCourse);
+            return new ResponseEntity(model, HttpStatus.OK);
         }
 
-        return Optional.ofNullable(resultCourse);
+        Map<Object, Object> errorModel = new HashMap<>();
+        errorModel.put("success", false);
+        errorModel.put("errorDescription", "Course with this id was not found");
+        return new ResponseEntity(errorModel, HttpStatus.BAD_REQUEST);
     }
 
     @CrossOrigin(origins = "*")
@@ -99,18 +101,25 @@ public class CoursesController {
 
     @CrossOrigin(origins = "*")
     @PostMapping(path = "/", consumes = "application/json", produces = "application/json")
-    public Course addCourse(@RequestBody CourseDto courseDto) {
+    public ResponseEntity addCourse(@RequestBody CourseDto courseDto) {
         Course course = new Course();
         course.setCourseName(courseDto.getCourseName());
         course.setCourseDescription(courseDto.getCourseDescription());
         course.setCourseDuration(courseDto.getCourseDuration());
+        course.setId(0);
         Course resultCourse = coursesRepository.save(course);
-        for (Long index : courseDto.getCourseAuthorsId()) {
-            Optional<User> users = usersRepository.findById(index);
-            users.ifPresent(user -> coursesRepository.addCourseAuthors(resultCourse.getId(), user.getId()));
+        if (courseDto.getCourseAuthorsId() != null) {
+            for (Long index : courseDto.getCourseAuthorsId()) {
+                Optional<User> users = usersRepository.findById(index);
+                users.ifPresent(user -> coursesRepository.addCourseAuthors(resultCourse.getId(), user.getId()));
+            }
         }
 
-        return resultCourse;
+        Map<Object, Object> model = new HashMap<>();
+        model.put("success", true);
+        model.put("course", resultCourse);
+
+        return new ResponseEntity(model, HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "*")

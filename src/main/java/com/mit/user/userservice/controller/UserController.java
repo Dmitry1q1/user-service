@@ -16,13 +16,16 @@ import java.util.*;
 public class UserController {
 
     final UsersRepository usersRepository;
+    final CoursesRepository coursesRepository;
     private final IUserService userService;
 
     @Autowired
     JwtTokenProvider jwtTokenProvider;
 
-    public UserController(UsersRepository usersRepository, IUserService userService) {
+    public UserController(UsersRepository usersRepository, CoursesRepository coursesRepository,
+                          IUserService userService) {
         this.usersRepository = usersRepository;
+        this.coursesRepository = coursesRepository;
         this.userService = userService;
     }
 
@@ -44,6 +47,7 @@ public class UserController {
             tempUser.setRecordBookNumber(user.getRecordBookNumber());
             tempUser.setRoles(user.getRoles());
             tempUser.setUserName(user.getUsername());
+            tempUser.setUserDescription(user.getUserDescription());
             model.add(tempUser);
         }
         return model;
@@ -51,8 +55,22 @@ public class UserController {
 
     @CrossOrigin(origins = "*")
     @GetMapping("/{id}")
-    public Optional<User> getUser(@PathVariable long id) {
-        return usersRepository.findById(id);
+    public ResponseEntity getUser(@PathVariable long id) {
+        Optional<User> user = usersRepository.findUserById(id);
+        if (user.isPresent()) {
+
+            Map<Object, Object> model = new LinkedHashMap<>();
+            model.put("success", true);
+            model.put("user", user.get());
+            List<Course> userCourses = coursesRepository.getUserCoursesById(id);
+            model.put("userCourses", userCourses);
+            return new ResponseEntity(model, HttpStatus.OK);
+        } else {
+            Map<Object, Object> errorModel = new HashMap<>();
+            errorModel.put("success", false);
+            errorModel.put("errorDescription", "There was not found any users with this id");
+            return new ResponseEntity(errorModel, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @CrossOrigin(origins = "*")
@@ -80,7 +98,12 @@ public class UserController {
     @GetMapping("/{userId}/courses/")
     public ResponseEntity getUserCourses(HttpServletRequest request, @PathVariable Long userId) {
         if (jwtTokenProvider.validateUsersData(request, userId)) {
-            return new ResponseEntity<>(usersRepository.getUserCourseById(userId), HttpStatus.OK);
+            List<Course> courses = coursesRepository.getUserCoursesById(userId);
+
+            Map<Object, Object> model = new HashMap<>();
+            model.put("success", true);
+            model.put("courses", courses);
+            return new ResponseEntity<>(model, HttpStatus.OK);
         } else {
             Map<Object, Object> errorModel = new HashMap<>();
             errorModel.put("success", false);
