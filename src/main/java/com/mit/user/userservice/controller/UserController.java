@@ -4,11 +4,17 @@ import com.mit.user.userservice.component.JwtTokenProvider;
 import com.mit.user.userservice.model.*;
 import com.mit.user.userservice.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.*;
 
 @RestController
@@ -18,6 +24,9 @@ public class UserController {
     final UsersRepository usersRepository;
     final CoursesRepository coursesRepository;
     private final IUserService userService;
+
+    @Value("${image.url-user-folder}")
+    private String imagePath;
 
     @Autowired
     JwtTokenProvider jwtTokenProvider;
@@ -48,6 +57,7 @@ public class UserController {
             tempUser.setRoles(user.getRoles());
             tempUser.setUserName(user.getUsername());
             tempUser.setUserDescription(user.getUserDescription());
+            tempUser.setUserPicture(user.getUserPicture());
             model.add(tempUser);
         }
         return model;
@@ -55,7 +65,7 @@ public class UserController {
 
     @CrossOrigin(origins = "*")
     @GetMapping("/token")
-    public ResponseEntity getUserByToken(HttpServletRequest request){
+    public ResponseEntity getUserByToken(HttpServletRequest request) {
         String token = jwtTokenProvider.resolveToken(request);
         Long userId = jwtTokenProvider.getUserId(token);
 
@@ -97,6 +107,35 @@ public class UserController {
     }
 
     @CrossOrigin(origins = "*")
+    @PostMapping(path = "/user-avatar/", consumes = "multipart/form-data", produces = "application/json")
+    public ResponseEntity addUserPicture(HttpServletRequest request,
+                                         @RequestParam("avatar") MultipartFile userImage) {
+
+        String token = jwtTokenProvider.resolveToken(request);
+        Long userId = jwtTokenProvider.getUserId(token);
+        if (!userImage.isEmpty()) {
+            try {
+                String newFileName = "user_" + userId + userImage.getOriginalFilename();
+                File image = new File(imagePath + newFileName);
+                OutputStream out = new FileOutputStream(image);
+
+                usersRepository.addPictureUrlToUser(image.getAbsolutePath(), userId);
+                out.write(userImage.getBytes());
+                out.close();
+            } catch (IOException e) {
+                Map<Object, Object> errorModel = new HashMap<>();
+                errorModel.put("success", false);
+                errorModel.put("errorDescription", e.getMessage());
+                return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
+            }
+        }
+        Map<Object, Object> model = new HashMap<>();
+        model.put("success", true);
+        model.put("description", "User avatar was successful added");
+        return new ResponseEntity<>(model, HttpStatus.OK);
+    }
+
+    @CrossOrigin(origins = "*")
     @PostMapping(path = "/", consumes = "application/json", produces = "application/json")
     public ResponseEntity addUser(@RequestBody UserDto user) {
         userService.registerUser(user);
@@ -106,6 +145,7 @@ public class UserController {
             errorModel.put("errorDescription", user.getErrorDescription());
             return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
         }
+
         Map<Object, Object> model = new HashMap<>();
         model.put("success", true);
         model.put("description", "Successful registration");

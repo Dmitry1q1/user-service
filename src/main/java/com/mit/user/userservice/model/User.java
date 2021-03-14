@@ -31,6 +31,9 @@ public class User implements UserDetails {
     @Column(name = "user_description")
     private String userDescription;
 
+    @Column(name = "user_picture")
+    private String userPicture;
+
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
 
@@ -112,6 +115,15 @@ public class User implements UserDetails {
 //    public void setCourses(List<Course> courses) {
 //        this.courses = courses;
 //    }
+
+
+    public String getUserPicture() {
+        return userPicture;
+    }
+
+    public void setUserPicture(String userPicture) {
+        this.userPicture = userPicture;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

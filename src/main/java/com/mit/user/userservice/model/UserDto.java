@@ -1,5 +1,7 @@
 package com.mit.user.userservice.model;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 public class UserDto {
@@ -12,6 +14,8 @@ public class UserDto {
     private String errorDescription;
     private String recordBookNumber;
     private String userDescription;
+    private String userPicture;
+
     private List<Role> roles;
 
     public List<Role> getRoles() {
@@ -73,6 +77,22 @@ public class UserDto {
     public void setUserDescription(String userDescription) {
         this.userDescription = userDescription;
     }
+
+    public String getUserPicture() {
+        return userPicture;
+    }
+
+    public void setUserPicture(String userPicture) {
+        this.userPicture = userPicture;
+    }
+
+//    public MultipartFile getUserImage() {
+//        return userImage;
+//    }
+//
+//    public void setUserImage(MultipartFile userImage) {
+//        this.userImage = userImage;
+//    }
 
     public void setPassword(String password) {
         this.password = password;

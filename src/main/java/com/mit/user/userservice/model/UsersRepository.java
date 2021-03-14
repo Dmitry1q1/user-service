@@ -29,6 +29,11 @@ public interface UsersRepository extends CrudRepository<User, Long> {
     void addRoleToUser(@Param("userId") long userId, @Param("roleId") long roleId);
 
     @Modifying
+    @Query(value="UPDATE user SET user_picture = :user_picture WHERE user_id = :userId",nativeQuery = true)
+    @Transactional
+    void addPictureUrlToUser(@Param("user_picture") String userPicture, @Param("userId") long userId);
+
+    @Modifying
     @Query(value = "INSERT INTO token_storage (user_id, token) VALUES (:userId,:token)", nativeQuery = true)
     @Transactional
     void sentToken(@Param("userId") long userId, @Param("token") String token);
