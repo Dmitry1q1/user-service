@@ -4,12 +4,18 @@ import com.mit.user.userservice.component.JwtTokenProvider;
 import com.mit.user.userservice.model.*;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.*;
 
 @RestController
@@ -18,6 +24,9 @@ public class CoursesController {
     final private CoursesRepository coursesRepository;
     final private UsersRepository usersRepository;
     final private ProblemRepository problemRepository;
+
+    @Value("${image.url-course-folder}")
+    private String imagePath;
 
     @Autowired
     JwtTokenProvider jwtTokenProvider;
@@ -43,6 +52,7 @@ public class CoursesController {
             courseDto.setCourseName(course.getCourseName());
             courseDto.setCourseDescription(course.getCourseDescription());
             courseDto.setCourseDuration(course.getCourseDuration());
+            courseDto.setCourseMainPictureUrl(course.getCourseMainPictureUrl());
             resultCourses.add(courseDto);
         }
         return resultCourses;
@@ -62,6 +72,7 @@ public class CoursesController {
             resultCourse.setCourseName(course.get().getCourseName());
             resultCourse.setCourseDescription(course.get().getCourseDescription());
             resultCourse.setCourseDuration(course.get().getCourseDuration());
+            resultCourse.setCourseMainPictureUrl(course.get().getCourseMainPictureUrl());
             List<Problem> problems = problemRepository.getAllProblemsFromCourse(courseId);
             resultCourse.setProblems(problems);
 
@@ -126,6 +137,33 @@ public class CoursesController {
     @DeleteMapping(path = "/{id}")
     public void deleteCourse(@PathVariable long id) {
         coursesRepository.deleteById(id);
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping(path = "/{courseId}/course-avatar/", consumes = "multipart/form-data", produces = "application/json")
+    public ResponseEntity addCoursePicture(@PathVariable long courseId,
+                                         @RequestParam("avatar") MultipartFile courseImage) {
+
+        if (!courseImage.isEmpty()) {
+            try {
+                String newFileName = "course_main_" + courseId + courseImage.getOriginalFilename();
+                File image = new File(imagePath + newFileName);
+                OutputStream out = new FileOutputStream(image);
+
+                coursesRepository.addMainPictureUrlToCourse(image.getAbsolutePath(), courseId);
+                out.write(courseImage.getBytes());
+                out.close();
+            } catch (IOException e) {
+                Map<Object, Object> errorModel = new HashMap<>();
+                errorModel.put("success", false);
+                errorModel.put("errorDescription", e.getMessage());
+                return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
+            }
+        }
+        Map<Object, Object> model = new HashMap<>();
+        model.put("success", true);
+        model.put("description", "Course avatar was successful added");
+        return new ResponseEntity<>(model, HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "*")

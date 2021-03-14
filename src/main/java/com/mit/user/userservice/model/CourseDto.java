@@ -9,6 +9,7 @@ public class CourseDto {
     private String courseDuration;
     private List<Problem> problems;
 //    private List<User> users;
+    private String courseMainPictureUrl;
     private List<Long> courseAuthorsId;
 
     public List<Long> getCourseAuthorsId() {
@@ -50,6 +51,15 @@ public class CourseDto {
 //    public void setUsers(List<User> users) {
 //        this.users = users;
 //    }
+
+
+    public String getCourseMainPictureUrl() {
+        return courseMainPictureUrl;
+    }
+
+    public void setCourseMainPictureUrl(String courseMainPictureUrl) {
+        this.courseMainPictureUrl = courseMainPictureUrl;
+    }
 
     public String getCourseDescription() {
         return courseDescription;

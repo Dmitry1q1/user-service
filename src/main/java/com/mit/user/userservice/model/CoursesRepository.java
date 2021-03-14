@@ -23,12 +23,15 @@ public interface CoursesRepository extends CrudRepository<Course, Long> {
     @Transactional
     public void deleteUserFromCourse(@Param("courseId") long courseId, @Param("userId") long userId);
 
-    @Query(value = "SELECT co.course_id, co.course_name, co.course_description, co.course_duration " +
+    @Query(value = "SELECT co.course_id, co.course_name, co.course_description, co.course_duration, co.course_main_picture " +
             "FROM users_courses uc " +
             "JOIN course co ON co.course_id = uc.course_id WHERE uc.user_id = :userId", nativeQuery = true)
     List<Course> getUserCoursesById(@Param("userId") long userId);
 
-
+    @Modifying
+    @Query(value="UPDATE course SET course_main_picture = :course_main_picture WHERE course_id = :courseId",nativeQuery = true)
+    @Transactional
+    void addMainPictureUrlToCourse(@Param("course_main_picture") String courseMainPicture, @Param("courseId") long courseId);
 
     @Query(value = "SELECT u.user_id, u.first_name, u.last_name, u.username, u.record_book_number" +
             " FROM user u JOIN users_courses uc ON" +

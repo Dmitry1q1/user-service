@@ -14,6 +14,9 @@ public class Course {
     @Column(name = "course_name")
     private String courseName;
 
+    @Column(name = "course_main_picture")
+    private String courseMainPictureUrl;
+
 //    @OneToMany
 //    @JoinTable(name = "course_problems",
 //            uniqueConstraints = {@UniqueConstraint(columnNames = {"problems_id", "course_course_id"})},
@@ -62,7 +65,19 @@ public class Course {
         this.courseName = courseName;
     }
 
-//    public List<Problem> getProblems() {
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getCourseMainPictureUrl() {
+        return courseMainPictureUrl;
+    }
+
+    public void setCourseMainPictureUrl(String courseMainPictureUrl) {
+        this.courseMainPictureUrl = courseMainPictureUrl;
+    }
+
+    //    public List<Problem> getProblems() {
 //        return problems;
 //    }
 //
