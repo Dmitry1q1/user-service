@@ -142,7 +142,7 @@ public class CoursesController {
     @CrossOrigin(origins = "*")
     @PostMapping(path = "/{courseId}/course-avatar/", consumes = "multipart/form-data", produces = "application/json")
     public ResponseEntity addCoursePicture(@PathVariable long courseId,
-                                         @RequestParam("avatar") MultipartFile courseImage) {
+                                           @RequestParam("avatar") MultipartFile courseImage) {
 
         if (!courseImage.isEmpty()) {
             try {

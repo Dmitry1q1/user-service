@@ -139,6 +139,7 @@ public class UserController {
     @PostMapping(path = "/", consumes = "application/json", produces = "application/json")
     public ResponseEntity addUser(@RequestBody UserDto user) {
         userService.registerUser(user);
+        usersRepository.addRoleToUser(user.getId(), 2);
         if (user.getErrorDescription() != null && !user.getErrorDescription().isEmpty()) {
             Map<Object, Object> errorModel = new HashMap<>();
             errorModel.put("success", false);

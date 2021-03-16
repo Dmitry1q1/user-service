@@ -15,7 +15,7 @@ public class User implements UserDetails {
     private long id;
 
 //    @Size(min=5, message = "Не меньше 5 знаков")
-    @Column(name = "username")
+    @Column(name = "username", unique = true)
     private String username;
     @Column(name = "first_name")
     private String firstName;

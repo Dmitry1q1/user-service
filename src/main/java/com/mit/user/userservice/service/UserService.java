@@ -14,6 +14,7 @@ public class UserService implements IUserService {
     private static final String LOGIN_IS_EMPTY = "Login is empty";
     private static final String PASSWORD_IS_EMPTY = "Password is empty";
     private static final String USERNAME_OR_PASSWORD_IS_WRONG = "Username or Password is wrong";
+    private static final String USERNAME_IS_NOT_UNIQUE = "Username is not unique";
 
     @Autowired
     private UsersRepository usersRepository;
@@ -33,6 +34,9 @@ public class UserService implements IUserService {
         if (!usersRepository.getUserByRecordBookNumber(user.getRecordBookNumber()).isEmpty()) {
             user.setErrorDescription(RECORD_BOOK_NUMBER_IS_NOT_UNIQUE);
         }
+        if (usersRepository.findByUsername(user.getUserName()) != null) {
+            user.setErrorDescription(USERNAME_IS_NOT_UNIQUE);
+        }
         entity.setRecordBookNumber(user.getRecordBookNumber());
         entity.setPassword(passwordEncoder.encode(user.getPassword()));
         if (user.getErrorDescription() == null) {
@@ -45,7 +49,7 @@ public class UserService implements IUserService {
     @Override
     public UserDto loginServer(UserDto user) {
         User entity = usersRepository.findByUsername(user.getUserName());
-        if(entity == null){
+        if (entity == null) {
             user.setErrorDescription(USERNAME_OR_PASSWORD_IS_WRONG);
             return user;
         }
