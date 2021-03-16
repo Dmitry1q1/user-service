@@ -2,6 +2,10 @@ package com.mit.user.userservice.controller;
 
 import com.mit.user.userservice.component.JwtTokenProvider;
 import com.mit.user.userservice.model.*;
+import com.mit.user.userservice.repository.CoursesRepository;
+import com.mit.user.userservice.repository.ProblemRepository;
+import com.mit.user.userservice.repository.SolutionRepository;
+import com.mit.user.userservice.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

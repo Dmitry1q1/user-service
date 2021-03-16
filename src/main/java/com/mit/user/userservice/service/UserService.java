@@ -2,7 +2,7 @@ package com.mit.user.userservice.service;
 
 import com.mit.user.userservice.model.User;
 import com.mit.user.userservice.model.UserDto;
-import com.mit.user.userservice.model.UsersRepository;
+import com.mit.user.userservice.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

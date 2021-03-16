@@ -3,7 +3,7 @@ package com.mit.user.userservice.controller;
 import com.mit.user.userservice.component.JwtTokenProvider;
 import com.mit.user.userservice.model.User;
 import com.mit.user.userservice.model.UserDto;
-import com.mit.user.userservice.model.UsersRepository;
+import com.mit.user.userservice.repository.UsersRepository;
 import com.mit.user.userservice.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

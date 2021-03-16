@@ -1,7 +1,7 @@
 package com.mit.user.userservice.component;
 
 import com.mit.user.userservice.model.Role;
-import com.mit.user.userservice.model.UsersRepository;
+import com.mit.user.userservice.repository.UsersRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;

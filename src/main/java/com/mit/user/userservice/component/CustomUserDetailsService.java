@@ -2,7 +2,7 @@ package com.mit.user.userservice.component;
 
 
 import com.mit.user.userservice.model.User;
-import com.mit.user.userservice.model.UsersRepository;
+import com.mit.user.userservice.repository.UsersRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

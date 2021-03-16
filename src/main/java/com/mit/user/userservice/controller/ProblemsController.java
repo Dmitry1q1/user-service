@@ -1,7 +1,7 @@
 package com.mit.user.userservice.controller;
 
 import com.mit.user.userservice.model.Problem;
-import com.mit.user.userservice.model.ProblemRepository;
+import com.mit.user.userservice.repository.ProblemRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

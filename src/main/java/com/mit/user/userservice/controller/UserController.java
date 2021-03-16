@@ -2,6 +2,8 @@ package com.mit.user.userservice.controller;
 
 import com.mit.user.userservice.component.JwtTokenProvider;
 import com.mit.user.userservice.model.*;
+import com.mit.user.userservice.repository.CoursesRepository;
+import com.mit.user.userservice.repository.UsersRepository;
 import com.mit.user.userservice.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
