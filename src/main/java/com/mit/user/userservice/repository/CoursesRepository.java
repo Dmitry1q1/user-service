@@ -24,13 +24,22 @@ public interface CoursesRepository extends CrudRepository<Course, Long> {
     @Transactional
     public void deleteUserFromCourse(@Param("courseId") long courseId, @Param("userId") long userId);
 
-    @Query(value = "SELECT co.course_id, co.course_name, co.course_description, co.course_duration, co.course_main_picture " +
+    @Query(value = "SELECT co.course_id, co.course_name, co.course_description," +
+            " co.course_duration, co.course_main_picture " +
             "FROM users_courses uc " +
             "JOIN course co ON co.course_id = uc.course_id WHERE uc.user_id = :userId", nativeQuery = true)
     List<Course> getUserCoursesById(@Param("userId") long userId);
 
     @Modifying
-    @Query(value="UPDATE course SET course_main_picture = :course_main_picture WHERE course_id = :courseId",nativeQuery = true)
+    @Query(value = "UPDATE course SET course_name = :courseName, course_description = :courseDescription," +
+            " course_duration = :courseDuration WHERE course_id = :courseId", nativeQuery = true)
+    @Transactional
+    void updateCourseInfo(@Param("courseName") String courseName, @Param("courseDescription") String courseDescription,
+                          @Param("courseDuration") String courseDuration, @Param("courseId") long courseId);
+
+    @Modifying
+    @Query(value = "UPDATE course SET course_main_picture = :course_main_picture" +
+            " WHERE course_id = :courseId", nativeQuery = true)
     @Transactional
     void addMainPictureUrlToCourse(@Param("course_main_picture") String courseMainPicture, @Param("courseId") long courseId);
 
@@ -39,11 +48,18 @@ public interface CoursesRepository extends CrudRepository<Course, Long> {
             " uc.user_id = u.user_id WHERE uc.course_id = :courseId", nativeQuery = true)
     List<String> getAllUsersFromCourses(@Param("courseId") long courseId);
 
-    @Query(value="SELECT * FROM course co WHERE co.course_id = :courseId", nativeQuery = true)
+    @Query(value = "SELECT * FROM course co WHERE co.course_id = :courseId", nativeQuery = true)
     Optional<Course> getCourseById(@Param("courseId") long courseId);
 
-    @Query(value="SELECT * FROM course_authors ca WHERE ca.course_id = :courseId", nativeQuery = true)
+    @Query(value = "SELECT ca.user_id FROM course_authors ca WHERE ca.course_id = :courseId", nativeQuery = true)
     List<Long> getCourseAuthorsByCourseId(@Param("courseId") long courseId);
+
+    @Modifying
+    @Query(value = "DELETE FROM course_authors" +
+            " WHERE user_id = :userId AND course_id = :courseId", nativeQuery = true)
+    @Transactional
+    void deleteCourseAuthorsByCourseIdAndUserId(@Param("courseId") long courseId,
+                                                @Param("userId") long userId);
 
     @Modifying
     @Query(value = "INSERT INTO course_authors (user_id, course_id) VALUES (:userId, :courseId)", nativeQuery = true)

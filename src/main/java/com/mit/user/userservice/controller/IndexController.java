@@ -95,7 +95,7 @@ public class IndexController {
     }
 
     @CrossOrigin(origins = "*")
-    @PostMapping(path = "/registration")
+    @PostMapping(path = "/registration", consumes = "application/json", produces = "application/json")
     public ResponseEntity addUser(@RequestBody UserDto user) {
         userService.registerUser(user);
         if (user.getErrorDescription() != null && !user.getErrorDescription().isEmpty()) {

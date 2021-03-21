@@ -143,6 +143,51 @@ public class CoursesController {
     }
 
     @CrossOrigin(origins = "*")
+    @PutMapping(path = "/", consumes = "application/json", produces = "application/json")
+    public ResponseEntity updateCourse(@RequestBody CourseDto courseDto) {
+        Optional<Course> course = coursesRepository.getCourseById(courseDto.getId());
+
+        if (course.isPresent()) {
+            long courseId = course.get().getId();
+            if (courseDto.getCourseDescription() != null) {
+                course.get().setCourseDescription(courseDto.getCourseDescription());
+            }
+            if (courseDto.getCourseDuration() != null) {
+                course.get().setCourseDuration(courseDto.getCourseDuration());
+            }
+            if (courseDto.getCourseName() != null) {
+                course.get().setCourseName(courseDto.getCourseName());
+            }
+
+            if (courseDto.getCourseAuthorsId() != null) {
+                List<Long> courseDtoAuthorsId = courseDto.getCourseAuthorsId();
+                List<Long> courseAuthorsId = coursesRepository.getCourseAuthorsByCourseId(courseId);
+                if (!courseDtoAuthorsId.equals(courseAuthorsId)) {
+                    for (Long idToDelete : courseAuthorsId) {
+                        coursesRepository.deleteCourseAuthorsByCourseIdAndUserId(courseId, idToDelete);
+                    }
+                    for (Long idToAdd : courseDtoAuthorsId) {
+                        Optional<User> users = usersRepository.findById(idToAdd);
+                        users.ifPresent(user -> coursesRepository.addCourseAuthors(courseId, user.getId()));
+                    }
+                }
+
+            }
+
+            coursesRepository.updateCourseInfo(course.get().getCourseName(), course.get().getCourseDescription(),
+                    course.get().getCourseDuration(), courseId);
+        }
+
+
+
+        Map<Object, Object> model = new HashMap<>();
+        model.put("success", true);
+        model.put("course", course);
+
+        return new ResponseEntity(model, HttpStatus.OK);
+    }
+
+    @CrossOrigin(origins = "*")
     @PostMapping(path = "/{courseId}/course-avatar/", consumes = "multipart/form-data", produces = "application/json")
     public ResponseEntity addCoursePicture(@PathVariable long courseId,
                                            @RequestParam("avatar") MultipartFile courseImage) {
