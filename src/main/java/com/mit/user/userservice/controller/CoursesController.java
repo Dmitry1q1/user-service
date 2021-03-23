@@ -171,14 +171,11 @@ public class CoursesController {
                         users.ifPresent(user -> coursesRepository.addCourseAuthors(courseId, user.getId()));
                     }
                 }
-
             }
 
             coursesRepository.updateCourseInfo(course.get().getCourseName(), course.get().getCourseDescription(),
                     course.get().getCourseDuration(), courseId);
         }
-
-
 
         Map<Object, Object> model = new HashMap<>();
         model.put("success", true);

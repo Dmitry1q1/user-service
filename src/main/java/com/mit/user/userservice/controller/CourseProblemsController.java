@@ -63,7 +63,10 @@ public class CourseProblemsController {
     @CrossOrigin(origins = "*")
     @PostMapping(path = "/{problemId}/solution-file/", consumes = "multipart/form-data")
     public ResponseEntity addSolutionOnProblemAsFile(HttpServletRequest request, @RequestParam("file") MultipartFile file, @PathVariable long courseId,
-                                                     @PathVariable long problemId, @RequestParam(name = "userId") long userId) {
+                                                     @PathVariable long problemId) {
+        String token = jwtTokenProvider.resolveToken(request);
+        Long userId = jwtTokenProvider.getUserId(token);
+
         Map<Object, Object> errorModel = new HashMap<>();
         errorModel.put("success", false);
         if (!jwtTokenProvider.validateUsersData(request, userId)) {
@@ -93,11 +96,11 @@ public class CourseProblemsController {
                 }
 
             } else {
-                errorModel.put("errorDescription", "Problem with this id was not found");
+                errorModel.put("errorDescription", "Problem not found");
                 return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
             }
         } else {
-            errorModel.put("errorDescription", "User with this id was not found");
+            errorModel.put("errorDescription", "User not found");
             return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
         }
     }
@@ -105,7 +108,10 @@ public class CourseProblemsController {
     @CrossOrigin(origins = "*")
     @PostMapping(path = "/{problemId}/solution-text/", consumes = "application/json")
     public ResponseEntity addSolutionOnProblemAsText(HttpServletRequest request, @RequestBody String solutionText, @PathVariable long courseId,
-                                                     @PathVariable long problemId, @RequestParam(name = "userId") long userId) {
+                                                     @PathVariable long problemId) {
+        String token = jwtTokenProvider.resolveToken(request);
+        Long userId = jwtTokenProvider.getUserId(token);
+
         Map<Object, Object> errorModel = new HashMap<>();
         errorModel.put("success", false);
 
@@ -130,11 +136,11 @@ public class CourseProblemsController {
                 return new ResponseEntity<>(solutionRepository.save(solution), HttpStatus.OK);
 
             } else {
-                errorModel.put("errorDescription", "Problem with this id was not found");
+                errorModel.put("errorDescription", "Problem not found");
                 return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
             }
         } else {
-            errorModel.put("errorDescription", "User with this id was not found");
+            errorModel.put("errorDescription", "User not found");
             return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
         }
     }
@@ -163,12 +169,12 @@ public class CourseProblemsController {
             }
             Map<Object, Object> errorModel = new HashMap<>();
             errorModel.put("success", false);
-            errorModel.put("errorDescription", "Course with this id was not found");
+            errorModel.put("errorDescription", "Course not found");
             return new ResponseEntity<>(errorModel, HttpStatus.NOT_FOUND);
         }
         Map<Object, Object> errorModel = new HashMap<>();
         errorModel.put("success", false);
-        errorModel.put("errorDescription", "Problem with this id was not found");
+        errorModel.put("errorDescription", "Problem not found");
         return new ResponseEntity<>(errorModel, HttpStatus.NOT_FOUND);
     }
 
@@ -186,7 +192,7 @@ public class CourseProblemsController {
         }
         Map<Object, Object> errorModel = new HashMap<>();
         errorModel.put("success", false);
-        errorModel.put("errorDescription", "Problem with this id was not found");
+        errorModel.put("errorDescription", "Problem not found");
         return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
     }
 }
