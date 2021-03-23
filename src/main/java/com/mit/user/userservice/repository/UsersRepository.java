@@ -13,8 +13,8 @@ import java.util.Optional;
 
 @Repository
 public interface UsersRepository extends CrudRepository<User, Long> {
-    @Query(value = "SELECT u.* FROM user u WHERE u.record_book_number = :record_book_number", nativeQuery = true)
-    List<User> getUserByRecordBookNumber(@Param("record_book_number") String recordBookNumber);
+    @Query(value = "SELECT u.* FROM user u WHERE u.record_book_number = :recordBookNumber", nativeQuery = true)
+    User getUserByRecordBookNumber(@Param("recordBookNumber") String recordBookNumber);
 
 
     List<User> findUserByLastName(@Param("last_name") String lastName);
@@ -28,6 +28,15 @@ public interface UsersRepository extends CrudRepository<User, Long> {
     @Query(value = "INSERT INTO user_roles (user_user_id, roles_id) VALUES (:userId,:roleId)", nativeQuery = true)
     @Transactional
     void addRoleToUser(@Param("userId") long userId, @Param("roleId") long roleId);
+
+    @Modifying
+    @Query(value = "UPDATE user SET first_name = :firstName, last_name = :lastName, " +
+            "username = :userName, user_description = :userDescription " +
+            "WHERE user_id = :userId", nativeQuery = true)
+    @Transactional
+    void updateUserInfo(@Param("userId") long userId, @Param("firstName") String firstName,
+                        @Param("lastName") String lastName, @Param("userName") String userName,
+                        @Param("userDescription") String userDescription);
 
     @Modifying
     @Query(value="UPDATE user SET user_picture = :user_picture WHERE user_id = :userId",nativeQuery = true)

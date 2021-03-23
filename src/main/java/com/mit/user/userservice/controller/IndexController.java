@@ -49,19 +49,21 @@ public class IndexController {
     @PostMapping(path = "/login")
     public ResponseEntity login(@RequestBody UserDto data) {
         try {
-            String username = data.getUserName();
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username,
+//            String username = data.getUserName();
+            String recordBookNumber = data.getRecordBookNumber();
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(recordBookNumber,
                     data.getPassword()));
 
             User user;
-            if (Objects.isNull(user = usersRepository.findByUsername(username))) {
-                throw new UsernameNotFoundException("Username: " + username + " not found");
+            if (Objects.isNull(user = usersRepository.getUserByRecordBookNumber(recordBookNumber))) {
+                throw new UsernameNotFoundException("User not found");
             }
-            String token = jwtTokenProvider.createToken(username, user.getRoles(), user.getId());
+            String token = jwtTokenProvider.createToken(recordBookNumber, user.getRoles(), user.getId());
 
             usersRepository.sentToken(user.getId(), token);
             Map<Object, Object> model = new HashMap<>();
-            model.put("username", username);
+//            model.put("username", username);
+            model.put("recordBookNumber", recordBookNumber);
             model.put("userid", user.getId());
             model.put("token", token);
 

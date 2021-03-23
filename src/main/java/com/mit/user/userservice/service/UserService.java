@@ -31,7 +31,7 @@ public class UserService implements IUserService {
             user.setErrorDescription(PASSWORD_COPIES_ARE_NOT_EQUALS);
         }
 
-        if (!usersRepository.getUserByRecordBookNumber(user.getRecordBookNumber()).isEmpty()) {
+        if (usersRepository.getUserByRecordBookNumber(user.getRecordBookNumber()) != null) {
             user.setErrorDescription(RECORD_BOOK_NUMBER_IS_NOT_UNIQUE);
         }
         if (usersRepository.findByUsername(user.getUserName()) != null) {

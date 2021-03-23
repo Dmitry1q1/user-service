@@ -83,7 +83,7 @@ public class UserController {
         } else {
             Map<Object, Object> errorModel = new HashMap<>();
             errorModel.put("success", false);
-            errorModel.put("errorDescription", "There was not found any users with this id");
+            errorModel.put("errorDescription", "User not found");
             return new ResponseEntity(errorModel, HttpStatus.BAD_REQUEST);
         }
     }
@@ -103,7 +103,7 @@ public class UserController {
         } else {
             Map<Object, Object> errorModel = new HashMap<>();
             errorModel.put("success", false);
-            errorModel.put("errorDescription", "There was not found any users with this id");
+            errorModel.put("errorDescription", "User not found");
             return new ResponseEntity(errorModel, HttpStatus.BAD_REQUEST);
         }
     }
@@ -155,10 +155,61 @@ public class UserController {
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
 
-//    @GetMapping("users/search")
-//    public List<User> getUserByRecordBookNumber(@RequestParam String recordBookNumber) {
-//        return usersRepository.getUserByRecordBookNumber(recordBookNumber);
-//    }
+    @CrossOrigin(origins = "*")
+    @PutMapping(path = "/", consumes = "application/json", produces = "application/json")
+    public ResponseEntity updateUser(@RequestBody UserDto user) {
+        long userId = user.getId();
+        Optional<User> userToUpdate = usersRepository.findById(userId);
+        if (userToUpdate.isPresent()) {
+            if (user.getFirstName() != null) {
+                userToUpdate.get().setFirstName(user.getFirstName());
+            }
+            if (user.getLastName() != null) {
+                userToUpdate.get().setLastName(user.getLastName());
+            }
+            if (user.getUserDescription() != null) {
+                userToUpdate.get().setUserDescription(user.getUserDescription());
+            }
+            if (user.getUserName() != null) {
+                if (usersRepository.findByUsername(user.getUserName()) != null) {
+                    Map<Object, Object> errorModel = new HashMap<>();
+                    errorModel.put("success", false);
+                    errorModel.put("errorDescription", "Username is not unique");
+                    return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
+                } else {
+                    userToUpdate.get().setUsername(user.getUserName());
+                }
+            }
+
+            usersRepository.updateUserInfo(userId, userToUpdate.get().getFirstName(),
+                    userToUpdate.get().getLastName(), userToUpdate.get().getUsername(),
+                    userToUpdate.get().getUserDescription());
+        }
+
+        Map<Object, Object> model = new HashMap<>();
+        model.put("success", true);
+        model.put("description", "Successful update");
+        return new ResponseEntity<>(model, HttpStatus.OK);
+    }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping(path = "/findByRecordBookNumber/", consumes = "application/json",
+            produces = "application/json")
+    public ResponseEntity getUserByRecordBookNumber(@RequestBody UserDto userDto) {
+        String recordBookNumber = userDto.getRecordBookNumber();
+        User user = usersRepository.getUserByRecordBookNumber(recordBookNumber);
+        if (user != null) {
+            Map<Object, Object> model = new HashMap<>();
+            model.put("success", true);
+            model.put("courses", user);
+            return new ResponseEntity<>(model, HttpStatus.OK);
+        } else {
+            Map<Object, Object> errorModel = new HashMap<>();
+            errorModel.put("success", false);
+            errorModel.put("errorDescription", "User not found");
+            return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @CrossOrigin(origins = "*")
     @GetMapping("/{userId}/courses/")
