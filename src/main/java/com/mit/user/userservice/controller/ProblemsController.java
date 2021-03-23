@@ -59,36 +59,34 @@ public class ProblemsController {
     }
 
     @CrossOrigin(origins = "*")
-    @PutMapping(path = "/{problemId}")
-    public ResponseEntity updateProblem(@PathVariable long problemId, @RequestBody Problem problem) {
-        StringBuilder errorDescription = new StringBuilder();
-        if (problem.getProblemName().isEmpty()) {
-            errorDescription.append("Problem's name must be not empty\n");
-        }
-        if (problem.getProblemText().isEmpty()) {
-            errorDescription.append("Problem's text must be not empty\n");
-        }
-        if (problem.getProblemTime() < 0) {
-            errorDescription.append("Problem's time must be > 0");
-        }
-        if (errorDescription.length() > 0) {
-            Map<Object, Object> errorModel = new HashMap<>();
-            errorModel.put("success", false);
-            errorModel.put("errorDescription", errorDescription);
-            return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
-        }
-        Optional<Problem> problemTemp = problemRepository.findById(problemId);
-        if (problemTemp.isPresent()) {
-            problemRepository.updateProblem(problemId, problem.getProblemName(),
-                    problem.getProblemText(), problem.getProblemTime());
+    @PutMapping(path = "/")
+    public ResponseEntity updateProblem(@RequestBody Problem problem) {
+        long problemId = problem.getId();
+        Optional<Problem> problemToUpdate = problemRepository.findById(problemId);
+        if(problemToUpdate.isPresent()){
+            if(!problemToUpdate.get().equals(problem)){
+                if(problem.getProblemName() != null){
+                    problemToUpdate.get().setProblemName(problem.getProblemName());
+                }
+                if(problem.getProblemText() != null){
+                    problemToUpdate.get().setProblemText(problem.getProblemText());
+                }
+                if(problem.getProblemTime() != null){
+                    problemToUpdate.get().setProblemTime(problem.getProblemTime());
+                }
+            }
+
+            problemRepository.updateProblem(problemId, problemToUpdate.get().getProblemName(),
+                    problemToUpdate.get().getProblemText(), problemToUpdate.get().getProblemTime());
             Map<Object, Object> model = new HashMap<>();
             model.put("success", true);
             model.put("description", "Problem was successfully updated");
             return new ResponseEntity<>(model, HttpStatus.OK);
         }
+
         Map<Object, Object> errorModel = new HashMap<>();
         errorModel.put("success", false);
-        errorModel.put("errorDescription", "Problem with this id was not found");
+        errorModel.put("errorDescription", "Problem not found");
         return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
     }
 

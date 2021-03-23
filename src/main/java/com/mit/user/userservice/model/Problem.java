@@ -12,7 +12,7 @@ public class Problem {
 
     private String problemText;
 
-    private long problemTime;
+    private Long problemTime;
 
     public long getId() {
         return id;
@@ -38,11 +38,11 @@ public class Problem {
         this.problemText = problemText;
     }
 
-    public long getProblemTime() {
+    public Long getProblemTime() {
         return problemTime;
     }
 
-    public void setProblemTime(long problemTime) {
+    public void setProblemTime(Long problemTime) {
         this.problemTime = problemTime;
     }
 }
