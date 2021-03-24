@@ -1,7 +1,10 @@
 package com.mit.user.userservice.controller;
 
 import com.mit.user.userservice.component.JwtTokenProvider;
-import com.mit.user.userservice.model.*;
+import com.mit.user.userservice.model.Course;
+import com.mit.user.userservice.model.Problem;
+import com.mit.user.userservice.model.Solution;
+import com.mit.user.userservice.model.User;
 import com.mit.user.userservice.repository.CoursesRepository;
 import com.mit.user.userservice.repository.ProblemRepository;
 import com.mit.user.userservice.repository.SolutionRepository;
@@ -82,12 +85,20 @@ public class CourseProblemsController {
             Optional<Problem> problem = problemRepository.findById(problemId);
             if (problem.isPresent()) {
 
+
                 try {
                     byte[] text = file.getBytes();
                     String solutionText = new String(text);
 
-                    Solution solution = new Solution(userId, problemId, LocalDateTime.now(),
-                            solutionText, "NOT OK", "Ready to compile");
+                    Solution solution = new Solution();
+                    solution.setUserId(userId);
+                    solution.setProblemId(problemId);
+                    solution.setSolutionDate(LocalDateTime.now());
+                    solution.setSolutionText(solutionText);
+                    solution.setSolutionStatus("NOT OK");
+                    solution.setStatusDescription("Ready to compile");
+//                    Solution solution = new Solution(userId, problemId, LocalDateTime.now(),
+//                            solutionText, "NOT OK", "Ready to compile");
 
                     return new ResponseEntity<>(solutionRepository.save(solution), HttpStatus.OK);
                 } catch (IOException e) {
@@ -130,8 +141,13 @@ public class CourseProblemsController {
             if (problem.isPresent()) {
 
 
-                Solution solution = new Solution(userId, problemId, LocalDateTime.now(),
-                        solutionText, "NOT OK", "Ready to compile");
+                Solution solution = new Solution();
+                solution.setUserId(userId);
+                solution.setProblemId(problemId);
+                solution.setSolutionDate(LocalDateTime.now());
+                solution.setSolutionText(solutionText);
+                solution.setSolutionStatus("NOT OK");
+                solution.setStatusDescription("Ready to compile");
 
                 return new ResponseEntity<>(solutionRepository.save(solution), HttpStatus.OK);
 

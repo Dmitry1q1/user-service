@@ -40,9 +40,10 @@ public class SolutionController {
         if (user.isPresent()) {
             Optional<Problem> problem = problemRepository.findById(solution.getProblemId());
             if (problem.isPresent()) {
-                LocalDateTime time = LocalDateTime.now();
-                solutionRepository.addSolution(solution.getUserId(), solution.getProblemId(), time,
-                        solution.getSolutionText(), solution.getSolutionStatus(), solution.getStatusDescription());
+
+                solutionRepository.addSolution(solution.getUserId(), solution.getProblemId(),
+                        LocalDateTime.now(), solution.getSolutionText(),
+                        "NOT OK", "Ready to compile");
                 Map<Object, Object> model = new HashMap<>();
                 model.put("success", true);
                 model.put("description", "Solution was successfully added");

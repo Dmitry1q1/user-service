@@ -10,14 +10,6 @@ public class Solution {
     @Column(name = "id")
     private long id;
 
-    public Solution(long userId, long problemId, LocalDateTime solutionDate, String solutionText, String solutionStatus, String statusDescription) {
-        this.userId = userId;
-        this.problemId = problemId;
-        this.solutionDate = solutionDate;
-        this.solutionText = solutionText;
-        this.solutionStatus = solutionStatus;
-        this.statusDescription = statusDescription;
-    }
 
     //    @OneToOne(cascade = CascadeType.ALL)
 //    @JoinColumn(name = "user_id", referencedColumnName = "user_id")

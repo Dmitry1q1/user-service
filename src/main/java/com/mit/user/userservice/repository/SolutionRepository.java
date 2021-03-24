@@ -19,7 +19,7 @@ public interface SolutionRepository extends CrudRepository<Solution, Long> {
 
     @Transactional
     @Modifying
-    @Query(value = "INSERT INTO test.solution (user_id, problems_id," +
+    @Query(value = "INSERT INTO solution (user_id, problems_id," +
             " solution_date, solution_text, solution_status, status_description)\n" +
             "VALUES (:user_id,:problems_id," +
             " :solution_date, :solution_text, :solution_status, :status_description)", nativeQuery = true)
