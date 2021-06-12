@@ -12,7 +12,15 @@ import com.mit.user.userservice.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.mit.user.userservice.config.SolutionStatus.READY_TO_COMPILE;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -66,7 +76,7 @@ public class CourseProblemsController {
     @CrossOrigin(origins = "*")
     @PostMapping(path = "/{problemId}/solution-file/", consumes = "multipart/form-data")
     public ResponseEntity addSolutionOnProblemAsFile(HttpServletRequest request, @RequestParam("file") MultipartFile file, @PathVariable long courseId,
-                                                     @PathVariable long problemId) {
+                                                     @PathVariable long problemId, @RequestParam Long programmingLanguage) {
         String token = jwtTokenProvider.resolveToken(request);
         Long userId = jwtTokenProvider.getUserId(token);
 
@@ -85,7 +95,6 @@ public class CourseProblemsController {
             Optional<Problem> problem = problemRepository.findById(problemId);
             if (problem.isPresent()) {
 
-
                 try {
                     byte[] text = file.getBytes();
                     String solutionText = new String(text);
@@ -95,10 +104,9 @@ public class CourseProblemsController {
                     solution.setProblemId(problemId);
                     solution.setSolutionDate(LocalDateTime.now());
                     solution.setSolutionText(solutionText);
+                    solution.setProgrammingLanguageId(programmingLanguage);
                     solution.setSolutionStatus("NOT OK");
-                    solution.setStatusDescription("Ready to compile");
-//                    Solution solution = new Solution(userId, problemId, LocalDateTime.now(),
-//                            solutionText, "NOT OK", "Ready to compile");
+                    solution.setStatusDescription(READY_TO_COMPILE.value);
 
                     return new ResponseEntity<>(solutionRepository.save(solution), HttpStatus.OK);
                 } catch (IOException e) {
@@ -118,8 +126,8 @@ public class CourseProblemsController {
 
     @CrossOrigin(origins = "*")
     @PostMapping(path = "/{problemId}/solution-text/", consumes = "application/json")
-    public ResponseEntity addSolutionOnProblemAsText(HttpServletRequest request, @RequestBody String solutionText, @PathVariable long courseId,
-                                                     @PathVariable long problemId) {
+    public ResponseEntity addSolutionOnProblemAsText(HttpServletRequest request, @RequestBody String solutionText,
+                                                     @PathVariable long problemId, @RequestParam Long programmingLanguage) {
         String token = jwtTokenProvider.resolveToken(request);
         Long userId = jwtTokenProvider.getUserId(token);
 
@@ -140,14 +148,14 @@ public class CourseProblemsController {
             Optional<Problem> problem = problemRepository.findById(problemId);
             if (problem.isPresent()) {
 
-
                 Solution solution = new Solution();
                 solution.setUserId(userId);
                 solution.setProblemId(problemId);
                 solution.setSolutionDate(LocalDateTime.now());
                 solution.setSolutionText(solutionText);
                 solution.setSolutionStatus("NOT OK");
-                solution.setStatusDescription("Ready to compile");
+                solution.setProgrammingLanguageId(programmingLanguage);
+                solution.setStatusDescription(READY_TO_COMPILE.value);
 
                 return new ResponseEntity<>(solutionRepository.save(solution), HttpStatus.OK);
 

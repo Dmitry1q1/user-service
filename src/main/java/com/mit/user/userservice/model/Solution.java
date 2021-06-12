@@ -1,6 +1,10 @@
 package com.mit.user.userservice.model;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.time.LocalDateTime;
 
 @Entity
@@ -10,14 +14,9 @@ public class Solution {
     @Column(name = "id")
     private long id;
 
-
-    //    @OneToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     @Column(name = "user_id")
     private long userId;
 
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "problems_id", referencedColumnName = "problems_id")
     @Column(name = "problems_id")
     private long problemId;
 
@@ -32,6 +31,17 @@ public class Solution {
 
     @Column(name = "status_description")
     private String statusDescription;
+
+    @Column(name = "programming_language_id")
+    private Long programmingLanguageId;
+
+    public Long getProgrammingLanguageId() {
+        return programmingLanguageId;
+    }
+
+    public void setProgrammingLanguageId(Long programmingLanguageId) {
+        this.programmingLanguageId = programmingLanguageId;
+    }
 
     public long getId() {
         return id;
