@@ -1,7 +1,6 @@
 package com.mit.user.userservice.controller;
 
 import com.mit.user.userservice.component.JwtTokenProvider;
-import com.mit.user.userservice.config.SolutionStatus;
 import com.mit.user.userservice.model.Problem;
 import com.mit.user.userservice.model.Solution;
 import com.mit.user.userservice.model.User;
@@ -11,7 +10,14 @@ import com.mit.user.userservice.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -46,7 +52,7 @@ public class SolutionController {
 
     @CrossOrigin(origins = "*")
     @PostMapping(path = "/{courseId}/{problemId}/", consumes = "application/json")
-    public ResponseEntity addSolution(HttpServletRequest request, @RequestBody String solutionText,
+    public ResponseEntity addSolution(HttpServletRequest request, @RequestBody Solution solution,
                                       @PathVariable long problemId, @RequestParam Long programmingLanguage) {
         String token = jwtTokenProvider.resolveToken(request);
         Long userId = jwtTokenProvider.getUserId(token);
@@ -59,6 +65,7 @@ public class SolutionController {
             return new ResponseEntity<>(errorModel, HttpStatus.FORBIDDEN);
         }
 
+        String solutionText = solution.getSolutionText();
         if (solutionText.isEmpty()) {
             errorModel.put("errorDescription", "solutionText not found");
             return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
@@ -68,7 +75,6 @@ public class SolutionController {
             Optional<Problem> problem = problemRepository.findById(problemId);
             if (problem.isPresent()) {
 
-                Solution solution = new Solution();
                 solution.setUserId(userId);
                 solution.setProblemId(problemId);
                 solution.setSolutionDate(LocalDateTime.now());

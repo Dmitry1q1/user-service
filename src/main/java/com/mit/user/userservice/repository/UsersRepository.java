@@ -16,7 +16,6 @@ public interface UsersRepository extends CrudRepository<User, Long> {
     @Query(value = "SELECT u.* FROM user u WHERE u.record_book_number = :recordBookNumber", nativeQuery = true)
     User getUserByRecordBookNumber(@Param("recordBookNumber") String recordBookNumber);
 
-
     List<User> findUserByLastName(@Param("last_name") String lastName);
 
     User findByUsername(@Param("username") String username);
@@ -39,7 +38,7 @@ public interface UsersRepository extends CrudRepository<User, Long> {
                         @Param("userDescription") String userDescription);
 
     @Modifying
-    @Query(value="UPDATE user SET user_picture = :user_picture WHERE user_id = :userId",nativeQuery = true)
+    @Query(value = "UPDATE user SET user_picture = :user_picture WHERE user_id = :userId", nativeQuery = true)
     @Transactional
     void addPictureUrlToUser(@Param("user_picture") String userPicture, @Param("userId") long userId);
 

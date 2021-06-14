@@ -33,7 +33,6 @@ import java.util.Optional;
 
 import static com.mit.user.userservice.config.SolutionStatus.READY_TO_COMPILE;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/courses/{courseId}/problems")
 public class CourseProblemsController {
@@ -126,7 +125,7 @@ public class CourseProblemsController {
 
     @CrossOrigin(origins = "*")
     @PostMapping(path = "/{problemId}/solution-text/", consumes = "application/json")
-    public ResponseEntity addSolutionOnProblemAsText(HttpServletRequest request, @RequestBody String solutionText,
+    public ResponseEntity addSolutionOnProblemAsText(HttpServletRequest request, @RequestBody Solution solution,
                                                      @PathVariable long problemId, @RequestParam Long programmingLanguage) {
         String token = jwtTokenProvider.resolveToken(request);
         Long userId = jwtTokenProvider.getUserId(token);
@@ -139,6 +138,7 @@ public class CourseProblemsController {
             return new ResponseEntity<>(errorModel, HttpStatus.FORBIDDEN);
         }
 
+        String solutionText = solution.getSolutionText();
         if (solutionText.isEmpty()) {
             errorModel.put("errorDescription", "solutionText not found");
             return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
@@ -148,7 +148,6 @@ public class CourseProblemsController {
             Optional<Problem> problem = problemRepository.findById(problemId);
             if (problem.isPresent()) {
 
-                Solution solution = new Solution();
                 solution.setUserId(userId);
                 solution.setProblemId(problemId);
                 solution.setSolutionDate(LocalDateTime.now());

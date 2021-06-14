@@ -1,7 +1,6 @@
 package com.mit.user.userservice.repository;
 
 import com.mit.user.userservice.model.Course;
-import org.hibernate.annotations.SQLInsert;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

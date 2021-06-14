@@ -1,7 +1,9 @@
 package com.mit.user.userservice.controller;
 
 import com.mit.user.userservice.component.JwtTokenProvider;
-import com.mit.user.userservice.model.*;
+import com.mit.user.userservice.model.Course;
+import com.mit.user.userservice.model.User;
+import com.mit.user.userservice.model.UserDto;
 import com.mit.user.userservice.repository.CoursesRepository;
 import com.mit.user.userservice.repository.UsersRepository;
 import com.mit.user.userservice.service.IUserService;
@@ -17,7 +19,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -229,12 +236,6 @@ public class UserController {
         }
 
     }
-
-
-//    @GetMapping("lastName")
-//    public Iterable<User> getUserByLastName(@RequestParam String lastName) {
-//        return usersRepository.findUserByLastName(lastName);
-//    }
 
     @CrossOrigin(origins = "*")
     @DeleteMapping("/{id}")
