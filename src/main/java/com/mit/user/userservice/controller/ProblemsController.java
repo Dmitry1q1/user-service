@@ -2,6 +2,8 @@ package com.mit.user.userservice.controller;
 
 import com.mit.user.userservice.component.JwtTokenProvider;
 import com.mit.user.userservice.model.Problem;
+import com.mit.user.userservice.model.Solution;
+import com.mit.user.userservice.model.Test;
 import com.mit.user.userservice.repository.ProblemRepository;
 import com.mit.user.userservice.repository.TestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,6 +116,70 @@ public class ProblemsController {
         errorModel.put("success", false);
         errorModel.put("errorDescription", "Problem not found");
         return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping(path = "/{problemId}/add-tests-as-text/", consumes = "application/json")
+    public ResponseEntity addTestsOnProblemAsText(HttpServletRequest request, @RequestBody Test test, @PathVariable long problemId) {
+        String token = jwtTokenProvider.resolveToken(request);
+        Long userId = jwtTokenProvider.getUserId(token);
+
+        Map<Object, Object> errorModel = new HashMap<>();
+        errorModel.put("success", false);
+        if (!jwtTokenProvider.validateUsersData(request, userId)) {
+            errorModel.put("errorDescription", "Wrong id. Forbidden");
+            return new ResponseEntity<>(errorModel, HttpStatus.FORBIDDEN);
+        }
+
+        if (test.getInputText().isEmpty()) {
+            errorModel.put("errorDescription", "Empty input text");
+            return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
+        }
+        if (test.getOutputText().isEmpty()) {
+            errorModel.put("errorDescription", "Empty output text");
+            return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
+        }
+
+        Optional<Problem> problem = problemRepository.findById(problemId);
+        if (problem.isPresent()) {
+
+            try {
+                Map<Object, Object> model = new HashMap<>();
+                model.put("success", true);
+                byte[] inputText = test.getInputText().getBytes();
+                byte[] outputText = test.getOutputText().getBytes();
+
+                long orderNumber = 1;
+                try {
+                    orderNumber = testRepository.getTestMaxOrderNumberForProblem(problemId) + 1;
+                } catch (NullPointerException e) {
+                    System.out.println(e.getMessage());
+                }
+
+                new File(problemsPath).mkdir();
+                new File(problemsPath + problemId).mkdir();
+                File inputFile = new File(problemsPath + problemId + "/input" + orderNumber + ".txt");
+                File outputFile = new File(problemsPath + problemId + "/output" + orderNumber + ".txt");
+                OutputStream inputFileOut = new FileOutputStream(inputFile);
+                OutputStream outputFileOut = new FileOutputStream(outputFile);
+
+                testRepository.addTest(problemId, orderNumber,
+                        new String(inputText, StandardCharsets.UTF_8), new String(outputText, StandardCharsets.UTF_8));
+                inputFileOut.write(inputText);
+                inputFileOut.close();
+                outputFileOut.write(outputText);
+                outputFileOut.close();
+
+                return new ResponseEntity<>(model, HttpStatus.OK);
+            } catch (IOException e) {
+                errorModel.put("errorDescription", e.getMessage());
+                return new ResponseEntity<>(errorModel, HttpStatus.CONFLICT);
+            }
+
+        } else {
+            errorModel.put("errorDescription", "Problem not found");
+            return new ResponseEntity<>(errorModel, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @CrossOrigin(origins = "*")
