@@ -2,11 +2,8 @@ package com.mit.user.userservice.controller;
 
 import com.mit.user.userservice.component.JwtTokenProvider;
 import com.mit.user.userservice.model.Problem;
-import com.mit.user.userservice.repository.CoursesRepository;
 import com.mit.user.userservice.repository.ProblemRepository;
-import com.mit.user.userservice.repository.SolutionRepository;
 import com.mit.user.userservice.repository.TestRepository;
-import com.mit.user.userservice.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -37,22 +34,14 @@ import java.util.Optional;
 @RequestMapping("/problems")
 public class ProblemsController {
     private final ProblemRepository problemRepository;
-    private final CoursesRepository coursesRepository;
-    private final UsersRepository usersRepository;
-    private final SolutionRepository solutionRepository;
     private final TestRepository testRepository;
     @Autowired
     JwtTokenProvider jwtTokenProvider;
     @Value("${test.problems-test-url}")
     private String problemsPath;
 
-    public ProblemsController(ProblemRepository problemRepository,
-                              CoursesRepository coursesRepository, UsersRepository usersRepository,
-                              SolutionRepository solutionRepository, TestRepository testRepository) {
+    public ProblemsController(ProblemRepository problemRepository, TestRepository testRepository) {
         this.problemRepository = problemRepository;
-        this.coursesRepository = coursesRepository;
-        this.usersRepository = usersRepository;
-        this.solutionRepository = solutionRepository;
         this.testRepository = testRepository;
     }
 
@@ -159,7 +148,13 @@ public class ProblemsController {
                 byte[] inputText = input.getBytes();
                 byte[] outputText = output.getBytes();
 
-                Long orderNumber = testRepository.getTestMaxOrderNumberForProblem(problemId) + 1;
+                long orderNumber = 1;
+                try {
+                    orderNumber = testRepository.getTestMaxOrderNumberForProblem(problemId) + 1;
+                } catch (NullPointerException e) {
+                    System.out.println(e.getMessage());
+                }
+
                 new File(problemsPath).mkdir();
                 new File(problemsPath + problemId).mkdir();
                 File inputFile = new File(problemsPath + problemId + "/input" + orderNumber + ".txt");
